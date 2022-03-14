@@ -1,15 +1,17 @@
 const express = require('express')
 
-const one=express()
+const put = express()
 
-const path=require('path')
 
-one.use('/frontend',express.static(path.resolve(__dirname,'frontend')))
+const port = 6586
 
-one.get('/',(req, res)=>{
-res.send('how you doing?')
+put.use('/frontend', express.static('frontend'))
+put.use(express.json())
+
+put.post('/data', (req, res)=>{
+    console.log(req.body)
 })
 
-one.listen(9658,()=>{
-console.log("running at:127.0.0.1:9658")
+put.listen(port, ()=>{
+console.log(`${'http://localhost:'}`+port+'/frontend/form.html')
 })
