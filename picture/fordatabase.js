@@ -1,25 +1,26 @@
-const express = require("express");
+const express = require("express")
 
-const app = express();
+const app = express()
 
-const db = require('mongoose');
+const moongoose = require("mongoose")
 
-const model = require('./moongoose/database')
+const models = require("./moongoose/database")
 
-
-db.connect('mongodb://localhost:27017/number-one-images')
-
+moongoose.connect("mongodb://localhost:27017/number-one-images")
 
 app.use(express.json())
 
 
-app.post("/api/creates", async (req, res) => {
-  const images = req.body;
-  console.log(images)
-  const one = await model.create({images})
-  console.log(one)
-});
+app.post("/api/send", async(req, res)=>{
+    const images = req.body;
+    console.log(images)
+    const imp = await models.create({images})
+    console.log(imp)
+    res.json(imp)
+})
 
-app.listen(9658, ()=>{
-    console.log("http://localhost:9658/api/creates")
+const port = 0906
+
+app.listen(port, ()=>{
+  console.log(`localhost:${port}/api/send`)
 })
