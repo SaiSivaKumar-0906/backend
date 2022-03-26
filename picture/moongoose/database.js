@@ -1,17 +1,15 @@
-const mongoose = require('mongoose')
+const moongoose = require("mongoose")
 
-
-const shcemas =  mongoose.Schema({
+const models = moongoose.Schema({
     images : {
         type : JSON,
     },
-    number : {
+    time : {
         type : Number,
-        required : true,
-        default : Date.now(),
-    },
-});
+        default : Date.now
+    }
+})
 
-const one = mongoose.model("images", shcemas)
+const shema = moongoose.model("images", models)
 
-module.exports= one
+module.exports = shema
