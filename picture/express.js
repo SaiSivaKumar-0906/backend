@@ -8,27 +8,37 @@ const path = require('path')
 
 const multer = require('multer')
 
-const storeage = multer.diskStorage({
-    destination : (one, File, back)=>{
+const moongoose = require("mongoose")
+
+const models = require("./moongoose/database")
+
+moongoose.connect("mongodb://localhost:27017/number-one-images")
+
+const imgstore = multer.diskStorage({
+    destination : (live, File, back)=>{
         back(null, "serverphotos")
     },
-    filename: (reslu, File, cd)=>{
+    filename : (let, File, cback)=>{
         console.log(File)
-        cd(null, Date.now() + path.extname(File.originalname))
+        cback(null, Date.now() + path.extname(File.originalname))
     }
 })
 
-const upload = multer({storage: storeage})
+const imgrec = multer({storage : imgstore})
 
-put.use('/frontend', express.static('frontend'))
+put.use('/one', express.static('one'))
 put.use(express.json())
 
-
-
-put.post('/data', upload.single('images') ,(req, res)=>{
-    console.log(req.body)
+put.post('/data', imgrec.single('images'), async(req, res)=>{
+    const images = req.body;
+    console.log(images)
+    const imp = await models.create({images})
+    console.log(imp)
+    res.send("uploaded")
 })
 
 put.listen(port, ()=>{
-console.log(`${'http://localhost:'}`+port+'/frontend/form.html')
+console.log(`${'http://localhost:'}`+port+'/one')
 })
+
+ 
