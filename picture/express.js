@@ -10,9 +10,21 @@ const multer = require('multer')
 
 const moongoose = require("mongoose")
 
+const fs = require('fs')
+
 moongoose.connect("mongodb://localhost:27017/number-one-images")
 
-const modules = require("./moongoose/database")
+const images = moongoose.Schema(
+    {
+       images : {
+           data : Buffer,
+           contentType : String
+       }
+    }
+)
+
+const modelss = moongoose.model("test", images)
+
 
 const imgstore = multer.diskStorage({
     destination : (live, File, back)=>{
@@ -30,15 +42,13 @@ put.use('/one', express.static('one'))
 put.use(express.json())
 
 put.post('/data', imgrec.single('images'), async(req, res)=>{
-    const images = req.body;
-
-    const imp = await modules.create({images})
-    console.log(imp)
-    res.send("uploaded")
+     const newItem = new modelss;
+     newItem.images.data = fs.readFileSync(req.files.serverphotos.path)
+     newItem.images.contentType = 'image/png'
+     newItem.save();
+     res.send("uploaded")
 })
 
 put.listen(port, ()=>{
-console.log(`${'http://localhost:'}`+port+'/one')
+console.log(`${'http://localhost:'}`+port+'/one/one.html')
 })
-
- 
