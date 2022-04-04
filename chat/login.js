@@ -8,15 +8,27 @@ mongoose.connect("mongodb://localhost/chat-login")
 
 const models = require("./models/moongose")
 
+const bycrypt = require("bcryptjs")
+
 
 app.use("/frontend", express.static("frontend"))
 
 app.use(express.json())
 app.post("/server/get-data", async (req, res)=>{
-    let username = req.body
-    console.log(username)
-    let test = await models.create(username)
-    console.log(test)
+    const {username, password : letters}= req.body
+    const password = await bycrypt.hash(letters, 10)
+    const one = req.body
+      try{
+          const db = await models.create({
+              username,
+              password
+          })
+          console.log(db)
+        }
+      catch(error){
+          console.log(error)
+      }
+      console.log(one)
 })
 
 app.listen(9696, ()=>{
