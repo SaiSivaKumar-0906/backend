@@ -14,9 +14,25 @@ const bycrypt = require("bcryptjs")
 app.use("/frontend", express.static("frontend"))
 
 app.use(express.json())
+
 app.post("/server/get-data", async (req, res)=>{
     const {username, password : letters}= req.body
     const password = await bycrypt.hash(letters, 10)
+    if(!username || typeof username !== "string"){
+          return res.json(
+              {status : 'error', 
+          error : 'username not there'})
+    }
+    if(!letters || typeof letters !== "string"){
+        return res.json(
+            {status : 'error', 
+            error : "wrong password"})
+    }
+    if(letters.length < 4){
+        return res.json(
+            {status : "error", 
+        error : "password length weak"})
+    }
     const one = req.body
       try{
           const db = await models.create({
@@ -26,7 +42,11 @@ app.post("/server/get-data", async (req, res)=>{
           console.log(db)
         }
       catch(error){
-          console.log(error)
+          if(error.code === 11000){
+                return res.json({ status: "error", error : "username already taken"})
+          }else if(error.code !== 11000){
+              return res.json({status : "ok"})
+          }
       }
       console.log(one)
 })
