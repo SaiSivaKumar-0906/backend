@@ -14,7 +14,12 @@ submit.onclick = async function(){
         body : JSON.stringify({
             username,
             password
-        })
-    })
+        }),
+    }).then((e)=>e.json())
+    if(result.status === "ok"){
+        alert('sent to database')
+    }else{
+        alert(result.error)
+    }
     console.log(result)
 }
