@@ -38,6 +38,11 @@ app.post("/api/login", async(req, res)=>{
 
 })
 
+app.post("/api/change-password", (req, res)=>{
+    const {token} = req.body
+    jwt.verify(token, JWTSCERET)
+})
+
 app.post("/server/get-data", async (req, res)=>{
     const {username, password : letters}= req.body
 
