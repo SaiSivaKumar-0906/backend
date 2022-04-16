@@ -38,9 +38,30 @@ app.post("/api/login", async(req, res)=>{
 
 })
 
-app.post("/api/change-password", (req, res)=>{
-    const {token} = req.body
-    jwt.verify(token, JWTSCERET)
+app.post("/api/change-password", async (req, res)=>{
+    const {token, newpassword :letters} = req.body
+    if(!letters || typeof letters !== "string"){
+        return res.json(
+            {status : 'error', 
+            error : "wrong password"})
+    }
+    if(letters.length < 4){
+        return res.json(
+            {status : "error", 
+        error : "password length weak"})
+    }
+    try{
+        const user = jwt.verify(token, JWTSCERET)
+        const id = user.id
+        const password = await bycrypt.hash(letters)
+        await models.updateOne({id}, {
+            $set  : { password }
+        }
+        )
+
+    }catch (error){
+       res.json({ status : "ok" , error : "something went wrong"})
+    }
 })
 
 app.post("/server/get-data", async (req, res)=>{
