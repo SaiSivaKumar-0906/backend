@@ -91,6 +91,7 @@ app.post("/server/get-data", async (req, res)=>{
               password
           })
           console.log(db)
+          res.json({status: "account created"})
         }
       catch(error){
           if(error.code === 11000){
