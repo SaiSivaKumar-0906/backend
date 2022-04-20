@@ -1,4 +1,8 @@
 let submit = document.getElementById("submit")
+let header = document.getElementById('result-data')
+
+
+
 
 submit.onclick = async function(){
     
@@ -7,6 +11,7 @@ submit.onclick = async function(){
     let password = document.getElementById("password").value
 
     const result = await fetch("/server/get-data", {
+        
         method : "POST",
         headers : {
             'Content-Type':'application/json'
@@ -15,11 +20,13 @@ submit.onclick = async function(){
             username,
             password
         }),
-    }).then((e)=>e.json())
-    if(result.status === "ok"){
-        alert('sent to database')
+
+    }
+    ).then((e)=>e.json())
+    if(result.status === "account created"){
+        header.innerHTML = "you've created account"
     }else{
-        alert(result.error)
+        header.innerHTML= result.error;
     }
     console.log(result)
 }
