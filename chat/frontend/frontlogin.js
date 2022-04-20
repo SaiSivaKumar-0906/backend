@@ -1,4 +1,5 @@
 let submit = document.getElementById("submit")
+let header = document.getElementById('result-data')
 
 submit.onclick = async function(){
     
@@ -17,10 +18,11 @@ submit.onclick = async function(){
         }),
     }).then((e)=>e.json())
     if(result.status === "ok"){
-        console.log(result.data)
-        alert('working')
+        console.log("got the token : ", result.data)
+        localStorage.setItem('token', result.data)
+        header.innerText = "successfully loged in"
     }else{
-        alert(result.error)
+        header.innerText = "password or username might be wrong.."
     }
     console.log(result)
 }
