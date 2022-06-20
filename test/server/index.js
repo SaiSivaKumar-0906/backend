@@ -1,22 +1,13 @@
-const http = require('http').createServer();
+const webSocket = require("ws");
 
-const io = require('socket.io')(http, {
-    cors: { origin: "*" }
-});
+const ws = new webSocket.Server({
+    port : 8080
+})
 
-let one = 1;
+ws.on("connection", (wss)=>{
+    wss.on('message', (data)=>{
+        console.log("message recieved from user %s",data);
+        wss.send(data);
+    })
+})
 
-io.on('connection', (socket) => {
-    if(one === 1){
-        console.log(`${one++} user connected`)
-    }else{
-        console.log(`${one++} users connected`)
-    }
-
-    socket.on('message', (message) =>     {
-        console.log(message);
-        io.emit('message', `${socket.id.substr(0,2)} said ${message}` );   
-    });
-});
-
-http.listen(8080, () => console.log('listening on http://localhost:8080') );
