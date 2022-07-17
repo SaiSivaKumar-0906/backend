@@ -1,19 +1,15 @@
 const input = document.getElementById("input").value
 const button = document.getElementById("button")
 
-let result;
-
 button.onclick = async function(){
-    result = await fetch("/send-data", {
+        await fetch("/post/data", {
         method : "POST",
         headers : {
-            'Accept': 'application/json',
-            'Content-Type':'application/json; charset=utf-8'
+            'Content-Type':'application/json',
         },
         body : JSON.stringify({
             input
         }),
        
-    })
+    }).then((e)=>console.log(e));
 }
-console.log(result);
