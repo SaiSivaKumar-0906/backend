@@ -1,22 +1,18 @@
-let submit = document.getElementById("submit")
-
+const button = document.getElementById("button");
+const username = document.getElementById("username").value;
+const password = document.getElementById("password").value;
 let result;
 
-submit.onclick = async function(){
-    
-    let username = document.getElementById("username").value
+const obj = {username, password}
 
-    let password = document.getElementById("password").value
+button.onclick = async function(){
 
-     result = await fetch("/post/data", {
+    result = await fetch("/app/login",{
         method : "POST",
-        headers : {
-            'Content-Type':'application/json'
+        headers :{
+            "Contenty-type":"application/json"
         },
-        body : JSON.stringify({
-            username,
-            password
-        }),
-       
-    }).then((e)=>console.log(e));
-}
+        body : JSON.stringify(obj)
+    }).then((e)=>console.log(e.json()))
+};
+
