@@ -5,8 +5,9 @@ const app = http.createServer(async(req, res, next)=>{
     const postData = [];
 
     if(req.url === "/api/login" && req.method === "POST"){
-    for await(const chunk of req){
-        postData.push(chunk)
+    for await(const bufferData of req){
+        postData.push(bufferData)
+        console.log(bufferData);
     } 
     const {username, password} = JSON.parse(Buffer.concat(postData).toString());
     if(!username){
