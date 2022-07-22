@@ -1,17 +1,17 @@
-const moongoose = require("mongoose")
-
+const moongoose = require("mongoose");
 
 const models = moongoose.Schema({
     username: {
-        type : String,
-        required : true,
+        type: String,
+        required: true,
         unique: true
+
     },
-    password : {
-        type : String
+    password:{
+        type :String,
     }
 })
 
-const shema = moongoose.model("information", models)
+const schema = moongoose.model("login", models);
 
-module.exports = shema
+module.exports = schema;
