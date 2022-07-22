@@ -1,28 +1,45 @@
 const http = require("http");
 
-const app = http.createServer(async(req, res, next)=>{
-    res.setHeader("Access-Control-Allow-Origin", "*");
+const mongoose = require("mongoose");
+
+mongoose.connect("mongodb://127.0.0.1/live-login");
+
+const models = require("./models");
+
+const app = http.createServer(async(req, res)=>{    
     const postData = [];
 
     if(req.url === "/api/login" && req.method === "POST"){
     for await(const bufferData of req){
         postData.push(bufferData)
-        console.log(bufferData);
     } 
+
     const {username, password} = JSON.parse(Buffer.concat(postData).toString());
-    if(!username){
-        res.write(JSON.stringify({message:"username must be write"}))
-    }else if(!password){
-        res.write(JSON.stringify({message:"password must be written"}))
+
+    if(!(username&&password)){
+        res.write(JSON.stringify({message:"wirte the username or password"}))
     }
-    else{
-        res.write(JSON.stringify({message:"account created"}))
+
+    try{
+        const db = await models.create({
+            username,
+            password
+        })
+        if(db === username,password){
+            res.write(JSON.stringify({messgae:"account created"}))
+            console.log({username, password}, db)
+        }
     }
-    console.log({username, password})
+    catch(error){
+        if(error.code === 11000){
+            res.write(JSON.stringify({message:"username already taken"}))
+        }
+    }
+
 }
 res.end();
 })
 
-app.listen(5500, ()=>{
-    console.log(5500)
+app.listen(9966, ()=>{
+    console.log(9966)
 })
