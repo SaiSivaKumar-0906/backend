@@ -17,7 +17,11 @@ const app = http.createServer(async(req, res)=>{
     const {username, password} = JSON.parse(Buffer.concat(postData).toString());
 
     if(!(username&&password)){
-        res.write(JSON.stringify({message:"wirte the username or password"}))
+        res.write(JSON.stringify({message:"wirte the username"}))
+    }
+    
+    if(!password){
+        res.write(JSON.stringify({messgae:"write the password"}))
     }
 
     try{
