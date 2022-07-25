@@ -44,7 +44,11 @@ const app = http.createServer(async(req, res)=>{
 
 }
     fs.readFile(`${__dirname}/login/index.html`, (err, data)=>{
-        res.end(data);
+        if(err){
+            console.log(err)
+        }else{
+            res.end(data)
+        }
     })
 })
 
