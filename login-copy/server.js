@@ -9,6 +9,7 @@ mongoose.connect("mongodb://127.0.0.1/live-login");
 const models = require("./models");
 
 const app = http.createServer(async(req, res)=>{ 
+    
     const postData = [];
 
     if(req.url === "/api/login" && req.method === "POST"){
@@ -27,13 +28,18 @@ const app = http.createServer(async(req, res)=>{
     }
 
     try{
-        const db = await models.create({
+        if(username === String){
+            res.write(JSON.stringify({message:"username must be string"}))
+         const db = await models.create({
             username,
             password
         })
-        if(db === username,password){
+         if(db === username,password){
             res.write(JSON.stringify({messgae:"account created"}))
             console.log({username, password}, db)
+        }
+        }else{
+          res.write(JSON.stringify({message:"username must be string"}))
         }
     }
     catch(error){
@@ -41,17 +47,16 @@ const app = http.createServer(async(req, res)=>{
             res.write(JSON.stringify({message:"username already taken"}))
         }
     }
-
 }
     fs.readFile(`${__dirname}/login/index.html`, (err, data)=>{
         if(err){
             console.log(err)
         }else{
-            res.end(data)
+            res.end(data);
         }
     })
 })
 
 app.listen(9966, ()=>{
-    console.log("http://127.0.0.1:9966")
+    console.log("http://192.168.0.129:9966")
 })
