@@ -4,18 +4,23 @@ const nodemailer = require("nodemailer");
 
 const app = http.createServer(async(req, res)=>{
 
+    if(req.url === "/send-email" && req.method === "POST"){
+
     let regex = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
     
-    const postData = [];
-    
-    if(req.url === "/send-email" && req.method === "POST"){
+    const postData = [];  
+
     for await(const chunk of req){
         postData.push(chunk)
     }
+
     const {mail} = JSON.parse(Buffer.concat(postData).toString());
+
 
     if(!regex.test(mail)){
        return res.end(JSON.stringify("write the correct email address like example@gmail.com"))
+    }else{
+        res.end(JSON.stringify("check your email"))
     }
 }
 
