@@ -70,7 +70,7 @@ sendMail().then(res => console.log(`mail sent to:${mail}`)).catch(err => console
 res.end(JSON.stringify("check mail"))   
 }  
 
-    fs.readFile(`${__dirname}/ui/mail.html`, {encoding:'utf-8', flag:'r'}, (err, data)=>{
+    fs.readFile(`${__dirname}/ui/mail.html`, (err, data)=>{
         if(err){
             console.log(err)
         }else{
