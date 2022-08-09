@@ -2,13 +2,15 @@ const http = require("http");
 const fs = require("fs")
 const nodemailer = require("nodemailer");
 const {google} = require("googleapis");
+const url = require("./url").url
+
+console.log(url.href)
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
 
-const random = Math.floor(Math.random()*256)
 
 const app = http.createServer(async(req, res)=>{
 
@@ -27,8 +29,7 @@ const app = http.createServer(async(req, res)=>{
 
     if(!regex.test(mail)){
        return res.end(JSON.stringify("write the correct email address like example@gmail.com"))
-    }  
-        
+    }   
     const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
 
     oAuth2Client.setCredentials({refresh_token: REFRESH_TOKEN})
@@ -52,7 +53,7 @@ async function sendMail(){
     const mailOptions = {
         from : 'webdev0906@gmail.com',
         to : mail,
-        text : `http://192.168.0.125/video/${random}\n share with your friends`
+        text : `${url.href}\n share with your friends`
     }
 
     const result = await transport.sendMail(mailOptions);
@@ -70,16 +71,17 @@ sendMail().then(res => console.log(`mail sent to:${mail}`)).catch(err => console
 
 res.end(JSON.stringify("check mail"))   
 }  
-
-    fs.readFile(`${__dirname}/ui/mail.html`, (err, data)=>{
+    if(req.url !== url.href){
+    fs.readFile(`${__dirname}/ui/mail.html`, {encoding:'utf-8', flag:'r'}, (err, data)=>{
         if(err){
             console.log(err)
         }else{
             res.end(data)
         }
     })
+}
 }); 
 
-app.listen(80, ()=>{
+app.listen(82, ()=>{
     console.log(`http://192.168.0.105`)
 })
