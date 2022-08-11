@@ -2,9 +2,9 @@ const http = require("http");
 const fs = require("fs")
 const nodemailer = require("nodemailer");
 const {google} = require("googleapis");
-const url = require("./url").url
+const url = require("node:url");
+const myUrl = url.parse(`http://192.168.0.105/video/something`);
 
-console.log(url.href)
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
@@ -43,7 +43,7 @@ async function sendMail(){
 
         auth: {
             type: 'OAuth2',
-            user: 'webdev0906@gmail.com',
+            user: 'saisivakumar0906@gmail.com',
             clientId: CLIENT_ID,
             clientSecret: CLIENT_SECRET,
             refreshToken : REFRESH_TOKEN,
@@ -51,9 +51,9 @@ async function sendMail(){
         }
     })
     const mailOptions = {
-        from : 'webdev0906@gmail.com',
+        from : 'saisivakumar0906@gmail.com',
         to : mail,
-        text : `${url.href}\n share with your friends`
+        text : `${myUrl.href}\n share with your friends`
     }
 
     const result = await transport.sendMail(mailOptions);
@@ -61,7 +61,7 @@ async function sendMail(){
   }
   catch(err){
     if(err){
-        console.log(err)
+       console.log(err)
     }
   }
 }
@@ -71,7 +71,7 @@ sendMail().then(res => console.log(`mail sent to:${mail}`)).catch(err => console
 
 res.end(JSON.stringify("check mail"))   
 }  
-    if(req.url !== url.href){
+   if(req.url === "/create" && req.method === "GET"){
     fs.readFile(`${__dirname}/ui/mail.html`, {encoding:'utf-8', flag:'r'}, (err, data)=>{
         if(err){
             console.log(err)
@@ -80,8 +80,20 @@ res.end(JSON.stringify("check mail"))
         }
     })
 }
+    function url(){
+        if(req.url === "/video/something" && req.method === "GET"){
+            fs.readFile(`${__dirname}/ui/create.html`, (err, data)=>{
+                if(err){
+                    console.log(err)
+                }else{
+                    res.end(data)
+                }
+            })
+        }
+    }
+    url();
 }); 
 
-app.listen(82, ()=>{
-    console.log(`http://192.168.0.105`)
+app.listen(80, ()=>{
+    console.log(`http://192.168.0.105:80`)
 })
