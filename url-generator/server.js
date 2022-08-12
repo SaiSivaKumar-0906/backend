@@ -2,14 +2,15 @@ const http = require("http");
 const fs = require("fs")
 const nodemailer = require("nodemailer");
 const {google} = require("googleapis");
-const url = require("node:url");
-const myUrl = url.parse(`http://192.168.0.105/video/something`);
+const myUrl = require("./url").url;
+console.log(myUrl.pathname)
 
 
-const CLIENT_ID = process.env.CLIENT_ID;
-const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const REDIRECT_URI = process.env.REDIRECT_URI;
-const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
+
+const CLIENT_ID = CLIENT_ID;
+const CLIENT_SECRET = CLIENT_SECRET;
+const REDIRECT_URI = REDIRECT_URI;
+const REFRESH_TOKEN = REFRESH_TOKEN;
 
 
 const app = http.createServer(async(req, res)=>{
@@ -71,8 +72,23 @@ sendMail().then(res => console.log(`mail sent to:${mail}`)).catch(err => console
 
 res.end(JSON.stringify("check mail"))   
 }  
-   if(req.url === "/create" && req.method === "GET"){
-    fs.readFile(`${__dirname}/ui/mail.html`, {encoding:'utf-8', flag:'r'}, (err, data)=>{
+
+function url(){
+    if(req.url === myUrl.pathname && req.method === "GET"){
+        fs.readFile(`${__dirname}/ui/create.html`, (err, data)=>{
+            if(err){
+                console.log(err)
+            }else{
+                res.end(data)
+            }
+        })
+    }
+}
+url();
+
+function mail(){
+    if(req.url !== myUrl.pathname && req.method==="GET"){
+    fs.readFile(`${__dirname}/ui/mail.html`, (err, data)=>{
         if(err){
             console.log(err)
         }else{
@@ -80,18 +96,8 @@ res.end(JSON.stringify("check mail"))
         }
     })
 }
-    function url(){
-        if(req.url === "/video/something" && req.method === "GET"){
-            fs.readFile(`${__dirname}/ui/create.html`, (err, data)=>{
-                if(err){
-                    console.log(err)
-                }else{
-                    res.end(data)
-                }
-            })
-        }
-    }
-    url();
+}
+mail();
 }); 
 
 app.listen(80, ()=>{
