@@ -3,14 +3,16 @@ const fs = require("fs")
 const nodemailer = require("nodemailer");
 const {google} = require("googleapis");
 const myUrl = require("./url").url;
-console.log(myUrl.pathname)
-
-
+const mongoose = require("mongoose");
+const db = require("./db/models")
+mongoose.connect("mongodb://127.0.0.1/mailId-url")
 
 const CLIENT_ID = CLIENT_ID;
 const CLIENT_SECRET = CLIENT_SECRET;
 const REDIRECT_URI = REDIRECT_URI;
-const REFRESH_TOKEN = REFRESH_TOKEN;
+const REFRESH_TOKEN = REFRESH_TOKEN ;
+
+let urlPathname = myUrl.pathname;
 
 
 const app = http.createServer(async(req, res)=>{
@@ -31,6 +33,7 @@ const app = http.createServer(async(req, res)=>{
     if(!regex.test(mail)){
        return res.end(JSON.stringify("write the correct email address like example@gmail.com"))
     }   
+
     const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
 
     oAuth2Client.setCredentials({refresh_token: REFRESH_TOKEN})
@@ -56,7 +59,6 @@ async function sendMail(){
         to : mail,
         text : `${myUrl.href}\n share with your friends`
     }
-
     const result = await transport.sendMail(mailOptions);
     return result;
   }
@@ -71,6 +73,19 @@ async function sendMail(){
 sendMail().then(res => console.log(`mail sent to:${mail}`)).catch(err => console.log(err.message))
 
 res.end(JSON.stringify("check mail"))   
+
+async function dbs(){
+    try{
+        const dbase = await db.create({
+            mail,
+            urlPathname
+        })
+        console.log(dbase)
+    }catch(err){
+        console.log(err)
+    }
+}
+dbs()
 }  
 
 function url(){
