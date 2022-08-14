@@ -2,23 +2,36 @@ const http = require("http");
 const fs = require("fs")
 const nodemailer = require("nodemailer");
 const {google} = require("googleapis");
-const myUrl = require("./url").url;
 const mongoose = require("mongoose");
+// const myUrl = require("./url").url;
 const db = require("./db/models")
 mongoose.connect("mongodb://127.0.0.1/mailId-url")
 
+const url = require("node:url");
+
+// let videoCount = (Math.random() + 1).toString(36).substring(7);
+
+// const myUrl = url.parse(`http://192.168.0.111/video/stream-${videoCount}`)
+
+let urlPathname
+
+
 const CLIENT_ID = CLIENT_ID;
 const CLIENT_SECRET = CLIENT_SECRET;
-const REDIRECT_URI = REDIRECT_URI;
+const REDIRECT_URI = EDIRECT_URI;
 const REFRESH_TOKEN = REFRESH_TOKEN ;
-
-let urlPathname = myUrl.pathname;
 
 
 const app = http.createServer(async(req, res)=>{
 
-    if(req.url === "/send-email" && req.method === "POST"){
+    let videoCount = (Math.random() + 1).toString(36).substring(7);
 
+    const myUrl = url.parse(`http://192.168.0.111/video/stream-${videoCount}`)
+
+    urlPathname = myUrl.pathname
+
+    if(req.url === "/send-email" && req.method === "POST"){
+ 
     let regex = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
     
     const postData = [];  
@@ -88,8 +101,9 @@ async function dbs(){
 dbs()
 }  
 
-function url(){
-    if(req.url === myUrl.pathname && req.method === "GET"){
+function urls(){
+
+    if(req.url === myUrl.pathname  && req.method === "GET"){
         fs.readFile(`${__dirname}/ui/create.html`, (err, data)=>{
             if(err){
                 console.log(err)
@@ -99,10 +113,10 @@ function url(){
         })
     }
 }
-url();
+urls();
 
 function mail(){
-    if(req.url !== myUrl.pathname && req.method==="GET"){
+    if(req.url === '/create' && req.method==="GET"){
     fs.readFile(`${__dirname}/ui/mail.html`, (err, data)=>{
         if(err){
             console.log(err)
@@ -113,8 +127,9 @@ function mail(){
 }
 }
 mail();
+
 }); 
 
 app.listen(80, ()=>{
-    console.log(`http://192.168.0.105:80`)
+    console.log(`http://192.168.0.111:80/create`)
 })
