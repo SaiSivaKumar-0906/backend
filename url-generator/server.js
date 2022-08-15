@@ -1,37 +1,34 @@
 const http = require("http");
 const fs = require("fs")
 const nodemailer = require("nodemailer");
+const url = require("node:url");
 const {google} = require("googleapis");
 const mongoose = require("mongoose");
-// const myUrl = require("./url").url;
 const db = require("./db/models")
 mongoose.connect("mongodb://127.0.0.1/mailId-url")
-
-const url = require("node:url");
-
-// let videoCount = (Math.random() + 1).toString(36).substring(7);
-
-// const myUrl = url.parse(`http://192.168.0.111/video/stream-${videoCount}`)
-
-let urlPathname
 
 
 const CLIENT_ID = CLIENT_ID;
 const CLIENT_SECRET = CLIENT_SECRET;
-const REDIRECT_URI = EDIRECT_URI;
-const REFRESH_TOKEN = REFRESH_TOKEN ;
+const REDIRECT_URI = REDIRECT_URI;
+const REFRESH_TOKEN = REFRESH_TOKEN;
 
+let pushUrl = [];
 
 const app = http.createServer(async(req, res)=>{
+
+    if(req.url === "/send-email" && req.method === "POST"){
 
     let videoCount = (Math.random() + 1).toString(36).substring(7);
 
     const myUrl = url.parse(`http://192.168.0.111/video/stream-${videoCount}`)
+    
+    let urlPathname = myUrl.pathname
+    
+    pushUrl.push(myUrl.pathname);
 
-    urlPathname = myUrl.pathname
+    obj = pushUrl
 
-    if(req.url === "/send-email" && req.method === "POST"){
- 
     let regex = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
     
     const postData = [];  
@@ -101,9 +98,11 @@ async function dbs(){
 dbs()
 }  
 
-function urls(){
+console.log(pushUrl)
 
-    if(req.url === myUrl.pathname  && req.method === "GET"){
+function urls(){
+    for(let i=0; i<pushUrl.length; i++){
+    if(req.url === pushUrl[i] && req.method === "GET"){
         fs.readFile(`${__dirname}/ui/create.html`, (err, data)=>{
             if(err){
                 console.log(err)
@@ -113,10 +112,11 @@ function urls(){
         })
     }
 }
+}
 urls();
 
 function mail(){
-    if(req.url === '/create' && req.method==="GET"){
+    if(req.url === "/create" && req.method === "GET"){
     fs.readFile(`${__dirname}/ui/mail.html`, (err, data)=>{
         if(err){
             console.log(err)
@@ -127,7 +127,6 @@ function mail(){
 }
 }
 mail();
-
 }); 
 
 app.listen(80, ()=>{
