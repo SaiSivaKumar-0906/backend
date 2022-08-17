@@ -98,9 +98,26 @@ async function dbs(){
 dbs()
 }  
 
-console.log(pushUrl)
+async function urls(){
+    if(req.url === "/send-url" && req.method === "POST"){
 
-function urls(){
+        const urlData = [];
+    
+        for await(const urldatas of req){
+            urlData.push(urldatas);
+        }
+    
+        const {urlId} = JSON.parse(Buffer.concat(urlData).toString())
+    
+        console.log({urlId})
+    
+        if(!urlId){
+           return res.end(JSON.stringify("some thing has happened"))
+        }
+
+        res.end(JSON.stringify("got the data"))
+    }
+
     for(let i=0; i<pushUrl.length; i++){
     if(req.url === pushUrl[i] && req.method === "GET"){
         fs.readFile(`${__dirname}/ui/create.html`, (err, data)=>{
@@ -111,6 +128,7 @@ function urls(){
             }
         })
     }
+    console.log(pushUrl)
 }
 }
 urls();
