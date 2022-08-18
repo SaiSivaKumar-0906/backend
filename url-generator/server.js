@@ -27,8 +27,6 @@ const app = http.createServer(async(req, res)=>{
     
     pushUrl.push(myUrl.pathname);
 
-    obj = pushUrl
-
     let regex = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
     
     const postData = [];  
@@ -67,7 +65,7 @@ async function sendMail(){
     const mailOptions = {
         from : 'saisivakumar0906@gmail.com',
         to : mail,
-        text : `${myUrl.href}\n share with your friends`
+        text : `${myUrl.href}, this link is four you\n${myUrl.pathname}, this is for your friends say them to paste this link in something input box`
     }
     const result = await transport.sendMail(mailOptions);
     return result;
@@ -109,13 +107,18 @@ async function urls(){
     
         const {urlId} = JSON.parse(Buffer.concat(urlData).toString())
     
-        console.log({urlId})
-    
         if(!urlId){
-           return res.end(JSON.stringify("some thing has happened"))
+           return res.end(JSON.stringify("write the data, then press the submit button"))
+        }else{
+            console.log({urlId})
         }
-
-        res.end(JSON.stringify("got the data"))
+        
+        if(await db.findOne({urlPathname : urlId}).exec()){
+            res.end(JSON.stringify("user present"))
+        }else{
+            res.end(JSON.stringify("there is no such link available. Or you might miswrote the link, do check it once"))
+        }
+        
     }
 
     for(let i=0; i<pushUrl.length; i++){
@@ -128,7 +131,7 @@ async function urls(){
             }
         })
     }
-    console.log(pushUrl)
+    // console.log(pushUrl)
 }
 }
 urls();
