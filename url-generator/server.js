@@ -65,7 +65,7 @@ async function sendMail(){
     const mailOptions = {
         from : 'saisivakumar0906@gmail.com',
         to : mail,
-        text : `${myUrl.href}, this link is four you\n${myUrl.pathname}, this is for your friends say them to paste this link in something input box`
+        text : `${myUrl.href}, open this link and share this link to your firends if you want to\n${myUrl.pathname}, this url will say to your friends you're streaming or not, to save thier time. Time is precious `
     }
     const result = await transport.sendMail(mailOptions);
     return result;
@@ -97,6 +97,7 @@ dbs()
 }  
 
 async function urls(){
+    let onePossibleway;
     if(req.url === "/send-url" && req.method === "POST"){
 
         const urlData = [];
@@ -106,6 +107,9 @@ async function urls(){
         }
     
         const {urlId} = JSON.parse(Buffer.concat(urlData).toString())
+
+        onePossibleway = urlId
+
     
         if(!urlId){
            return res.end(JSON.stringify("write the data, then press the submit button"))
@@ -113,12 +117,11 @@ async function urls(){
             console.log({urlId})
         }
         
-        if(await db.findOne({urlPathname : urlId}).exec()){
-            res.end(JSON.stringify("user present"))
+        if(await db.findOne({urlPathname: urlId})){
+            res.end(JSON.stringify("user is currently streaming"))
         }else{
-            res.end(JSON.stringify("there is no such link available. Or you might miswrote the link, do check it once"))
+            res.end(JSON.stringify("user not streaming right now"))
         }
-        
     }
 
     for(let i=0; i<pushUrl.length; i++){
