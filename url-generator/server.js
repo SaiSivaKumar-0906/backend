@@ -8,10 +8,10 @@ const db = require("./db/models")
 mongoose.connect("mongodb://127.0.0.1/mailId-url")
 
 
-const CLIENT_ID = '260469116614-pbjv89ra7pcbslqlitehi2uf4ohrb8in.apps.googleusercontent.com';
-const CLIENT_SECRET = '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';
-const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
-const REFRESH_TOKEN = '1//04hhAHpd-x1kaCgYIARAAGAQSNwF-L9Ir-PMxDzdIiPOx5X4AsYxWXWxN7-R4sX25zS2RcE4EZKFtuln9Vht0eYMPgBl2gbvzMAE';
+const CLIENT_ID = CLIENT_ID;
+const CLIENT_SECRET = CLIENT_SECRET;
+const REDIRECT_URI = REDIRECT_URI;
+const REFRESH_TOKEN = REFRESH_TOKEN;
 
 let pushUrl = [];
 
