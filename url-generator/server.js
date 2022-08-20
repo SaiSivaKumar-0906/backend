@@ -8,10 +8,10 @@ const db = require("./db/models")
 mongoose.connect("mongodb://127.0.0.1/mailId-url")
 
 
-const CLIENT_ID = CLIENT_ID;
-const CLIENT_SECRET = CLIENT_SECRET;
-const REDIRECT_URI = REDIRECT_URI;
-const REFRESH_TOKEN = REFRESH_TOKEN;
+const CLIENT_ID = '260469116614-pbjv89ra7pcbslqlitehi2uf4ohrb8in.apps.googleusercontent.com';
+const CLIENT_SECRET = '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';
+const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
+const REFRESH_TOKEN = '1//04hhAHpd-x1kaCgYIARAAGAQSNwF-L9Ir-PMxDzdIiPOx5X4AsYxWXWxN7-R4sX25zS2RcE4EZKFtuln9Vht0eYMPgBl2gbvzMAE';
 
 let pushUrl = [];
 
@@ -21,7 +21,7 @@ const app = http.createServer(async(req, res)=>{
 
     let videoCount = (Math.random() + 1).toString(36).substring(7);
 
-    const myUrl = url.parse(`http://192.168.0.111/video/stream-${videoCount}`)
+    const myUrl = url.parse(`http://192.168.204.180/video/stream-${videoCount}`)
     
     let urlPathname = myUrl.pathname
     
@@ -124,8 +124,7 @@ async function urls(){
         }
     }
 
-    for(let i=0; i<pushUrl.length; i++){
-    if(req.url === pushUrl[i] && req.method === "GET"){
+    if(await db.findOne({urlPathname: req.url}) && req.method === "GET"){
         fs.readFile(`${__dirname}/ui/create.html`, (err, data)=>{
             if(err){
                 console.log(err)
@@ -135,7 +134,6 @@ async function urls(){
         })
     }
     // console.log(pushUrl)
-}
 }
 urls();
 
