@@ -8,6 +8,10 @@ const models = mongoose.Schema({
     urlPathname:{
         type:String,
         require:true
+    },
+    ipAddress:{
+        type:String,
+        require:true
     }
 })
 const Schema = mongoose.model("host-info", models);
