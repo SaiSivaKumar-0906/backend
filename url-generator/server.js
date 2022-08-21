@@ -4,7 +4,8 @@ const nodemailer = require("nodemailer");
 const url = require("node:url");
 const {google} = require("googleapis");
 const mongoose = require("mongoose");
-const db = require("./db/models")
+const db = require("./db/models");
+const express = require("express");
 mongoose.connect("mongodb://127.0.0.1/mailId-url")
 
 
@@ -16,12 +17,23 @@ const REFRESH_TOKEN = REFRESH_TOKEN;
 let pushUrl = [];
 
 const app = http.createServer(async(req, res)=>{
+    
+    let ip;
+
+    if(req.headers['x-forwarded-for']){
+        ip = req.headers['x-forwarded-for'].split(",")[0];
+    }else if(req.socket && req.socket.remoteAddress){
+        ip = req.socket.remoteAddress;
+    }else{
+        ip = req.ip;
+    }
+    console.log(`ip address is ${ip}`)
 
     if(req.url === "/send-email" && req.method === "POST"){
 
     let videoCount = (Math.random() + 1).toString(36).substring(7);
 
-    const myUrl = url.parse(`http://192.168.204.180/video/stream-${videoCount}`)
+    const myUrl = url.parse(`http://localhost/video/stream-${videoCount}`)
     
     let urlPathname = myUrl.pathname
     
@@ -86,7 +98,8 @@ async function dbs(){
     try{
         const dbase = await db.create({
             mail,
-            urlPathname
+            urlPathname,
+            ipAddress
         })
         console.log(dbase)
     }catch(err){
@@ -97,7 +110,7 @@ dbs()
 }  
 
 async function urls(){
-    let onePossibleway;
+
     if(req.url === "/send-url" && req.method === "POST"){
 
         const urlData = [];
@@ -107,10 +120,7 @@ async function urls(){
         }
     
         const {urlId} = JSON.parse(Buffer.concat(urlData).toString())
-
-        onePossibleway = urlId
-
-    
+  
         if(!urlId){
            return res.end(JSON.stringify("write the data, then press the submit button"))
         }else{
@@ -124,10 +134,10 @@ async function urls(){
         }
     }
 
-    if(await db.findOne({urlPathname: req.url}) && req.method === "GET"){
+    if(await db.findOne({urlPathname: req.url}, {ipAddress: ip}) && req.method === "GET"){
         fs.readFile(`${__dirname}/ui/create.html`, (err, data)=>{
             if(err){
-                console.log(err)
+               res.end("your ip address is not the same")
             }else{
                 res.end(data)
             }
@@ -152,5 +162,5 @@ mail();
 }); 
 
 app.listen(80, ()=>{
-    console.log(`http://192.168.0.111:80/create`)
+    console.log(`http://192.168.43.180/create`)
 })
