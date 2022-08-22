@@ -1,12 +1,16 @@
-const http = require("http");
+const https = require('https');
 const fs = require("fs")
 const nodemailer = require("nodemailer");
 const url = require("node:url");
 const {google} = require("googleapis");
 const mongoose = require("mongoose");
 const db = require("./db/models");
-const express = require("express");
 mongoose.connect("mongodb://127.0.0.1/mailId-url")
+
+const options = {
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem')
+};
 
 
 const CLIENT_ID = CLIENT_ID;
@@ -16,18 +20,19 @@ const REFRESH_TOKEN = REFRESH_TOKEN;
 
 let pushUrl = [];
 
-const app = http.createServer(async(req, res)=>{
+const app = https.createServer(options, async(req, res)=>{
     
-    let ip;
+    let ipAddress;
 
     if(req.headers['x-forwarded-for']){
-        ip = req.headers['x-forwarded-for'].split(",")[0];
+        ipAddress = req.headers['x-forwarded-for'].split(",")[0];
     }else if(req.socket && req.socket.remoteAddress){
-        ip = req.socket.remoteAddress;
+        ipAddress = req.socket.remoteAddress;
     }else{
-        ip = req.ip;
+        ipAddress = req.ip;
     }
-    console.log(`ip address is ${ip}`)
+
+    console.log(`ip address is ${ipAddress}`)
 
     if(req.url === "/send-email" && req.method === "POST"){
 
@@ -134,10 +139,10 @@ async function urls(){
         }
     }
 
-    if(await db.findOne({urlPathname: req.url}, {ipAddress: ip}) && req.method === "GET"){
+    if(await db.findOne({urlPathname: req.url}) && req.method === "GET"){
         fs.readFile(`${__dirname}/ui/create.html`, (err, data)=>{
             if(err){
-               res.end("your ip address is not the same")
+               res.end(JSON.stringify("your ip address is not the same"))
             }else{
                 res.end(data)
             }
