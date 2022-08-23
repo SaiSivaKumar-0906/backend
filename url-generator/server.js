@@ -1,17 +1,11 @@
-const https = require('https');
+const http = require('http');
 const fs = require("fs")
 const nodemailer = require("nodemailer");
-const url = require("node:url");
+const url = require("url");
 const {google} = require("googleapis");
 const mongoose = require("mongoose");
 const db = require("./db/models");
 mongoose.connect("mongodb://127.0.0.1/mailId-url")
-
-const options = {
-    key: fs.readFileSync('key.pem'),
-    cert: fs.readFileSync('cert.pem')
-};
-
 
 const CLIENT_ID = CLIENT_ID;
 const CLIENT_SECRET = CLIENT_SECRET;
@@ -20,7 +14,7 @@ const REFRESH_TOKEN = REFRESH_TOKEN;
 
 let pushUrl = [];
 
-const app = https.createServer(options, async(req, res)=>{
+const app = http.createServer(async(req, res)=>{
     
     let ipAddress;
 
