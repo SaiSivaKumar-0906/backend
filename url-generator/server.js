@@ -147,7 +147,7 @@ async function urls(){
 urls();
 
 function mail(){
-    if(req.url === "/create" && req.method === "GET"){
+    if(!(await db.findOne({urlPathname: req.url}) && req.method === "GET"){
     fs.readFile(`${__dirname}/ui/mail.html`, (err, data)=>{
         if(err){
             console.log(err)
