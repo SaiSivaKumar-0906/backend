@@ -15,18 +15,6 @@ const REFRESH_TOKEN = REFRESH_TOKEN;
 let pushUrl = [];
 
 const app = http.createServer(async(req, res)=>{
-    
-    let ipAddress;
-
-    if(req.headers['x-forwarded-for']){
-        ipAddress = req.headers['x-forwarded-for'].split(",")[0];
-    }else if(req.socket && req.socket.remoteAddress){
-        ipAddress = req.socket.remoteAddress;
-    }else{
-        ipAddress = req.ip;
-    }
-
-    console.log(`ip address is ${ipAddress}`)
 
     if(req.url === "/send-email" && req.method === "POST"){
 
@@ -66,7 +54,7 @@ async function sendMail(){
 
         auth: {
             type: 'OAuth2',
-            user: 'saisivakumar0906@gmail.com',
+            user: MAIL_ID,
             clientId: CLIENT_ID,
             clientSecret: CLIENT_SECRET,
             refreshToken : REFRESH_TOKEN,
