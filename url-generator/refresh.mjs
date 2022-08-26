@@ -5,9 +5,9 @@ const refresh_token = async ()=>{
             'Content-Type':'application:json'
         }, 
         body : JSON.stringify({
-            "client_id":"664042363194-72h9728po8rc5kt5dh20sd582ct692t9.apps.googleusercontent.com",
-            "client_secret":"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",
-            "refresh_token":"1//04VRGt7e9A4EOCgYIARAAGAQSNwF-L9Ir1mG6-Fd32AAtYTsma33_8n_PCQk24sfzNBKXdf4woUf3RSTc0t47Rnw-UhGql0hlosE",
+            "client_id":CLIENT_ID,
+            "client_secret":CLIENT_SECRET,
+            "refresh_token":REFRESH_TOKEN,
             "grant_type": "refresh_token"
         })
     })
