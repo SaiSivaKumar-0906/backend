@@ -98,28 +98,28 @@ dbs()
 
 async function urls(){
 
-    if(req.url === "/send-url" && req.method === "POST"){
+//     if(req.url === "/send-url" && req.method === "POST"){
 
-        const urlData = [];
+//         const urlData = [];
     
-        for await(const urldatas of req){
-            urlData.push(urldatas);
-        }
+//         for await(const urldatas of req){
+//             urlData.push(urldatas);
+//         }
     
-        const {urlId} = JSON.parse(Buffer.concat(urlData).toString())
+//         const {urlId} = JSON.parse(Buffer.concat(urlData).toString())
   
-        if(!urlId){
-           return res.end(JSON.stringify("write the data, then press the submit button"))
-        }else{
-            console.log({urlId})
-        }
+//         if(!urlId){
+//            return res.end(JSON.stringify("write the data, then press the submit button"))
+//         }else{
+//             console.log({urlId})
+//         }
         
-        if(await db.findOne({urlPathname: urlId})){
-            res.end(JSON.stringify("user is currently streaming"))
-        }else{
-            res.end(JSON.stringify("user not streaming right now"))
-        }
-    }
+//         if(await db.findOne({urlPathname: urlId})){
+//             res.end(JSON.stringify("user is currently streaming"))
+//         }else{
+//             res.end(JSON.stringify("user not streaming right now"))
+//         }
+//     }
 
     if(await db.findOne({urlPathname: req.url}) && req.method === "GET"){
         fs.readFile(`${__dirname}/ui/create.html`, (err, data)=>{
