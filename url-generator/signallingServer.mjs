@@ -1,17 +1,36 @@
-const { WebSocketServer } = require("ws")
+const os = require("node:os")
+const http = require("node:http");
+const mongoose = require("mongoose");
+const db = require("./db/models")
+mongoose.connect("mongodb://127.0.0.1/mailId-url")
+const fs = require("node:fs");
+const { WebSocketServer } = require("ws");
 
-const wss = new WebSocketServer({port:9966});
-
-let howManyPeople = "a mfer connected"
-
-wss.on("connection", (ws)=>{
-    console.log(howManyPeople);
-
-    ws.on("message", (data)=>{
-        let {userSocket} = JSON.parse(data);
-        console.log({userSocket})
-        ws.send(JSON.stringify({userSocket}))
-    })
+const app = http.createServer(async(req, res)=>{
+    if(await db.findOne({urlPathname: req.url}) && req.method === "GET"){
+       fs.readFile(`${__dirname}/public/create.html`, (err, data)=>{
+         if(err){
+            console.log(err)
+         }else{
+            res.end(data)
+         }
+       })        
+    }
 })
 
-console.log("socket server running")
+const wss = new WebSocketServer({port:8080})
+
+wss.on("connection", (ws)=>{
+   console.log("user connected");
+
+   ws.on("message", (data)=>{
+      console.log("message %s", data);
+   })
+   ws.send("shit")
+})
+
+
+
+app.listen(9966, ()=>{
+    console.log(8080)
+})
