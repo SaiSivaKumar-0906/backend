@@ -7,10 +7,10 @@ const mongoose = require("mongoose");
 const db = require("./db/models");
 mongoose.connect("mongodb://127.0.0.1/mailId-url")
 
-const CLIENT_ID = CLIENT_ID;
-const CLIENT_SECRET = CLIENT_SECRET;
-const REDIRECT_URI = REDIRECT_URI;
-const REFRESH_TOKEN = REFRESH_TOKEN;
+const CLIENT_ID = '810339894417-i10suc51eicef83cbvu4nr3nna90p41j.apps.googleusercontent.com';
+const CLIENT_SECRET = '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';
+const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
+const REFRESH_TOKEN = '1//04-G9kIm9tVOUCgYIARAAGAQSNwF-L9IrXZ0L-JhQhdVxHPMw5Jta0PuDpl6pgZyNOhobzyG4z0C6NCEqPNvd9Q2mAt8TCpF6soY';
 
 let pushUrl = [];
 
@@ -35,8 +35,7 @@ const app = http.createServer(async(req, res)=>{
     }
 
     const {mail} = JSON.parse(Buffer.concat(postData).toString());
-
-
+    
     if(!regex.test(mail)){
        return res.end(JSON.stringify("write the correct email address like example@gmail.com"))
     }   
@@ -54,7 +53,7 @@ async function sendMail(){
 
         auth: {
             type: 'OAuth2',
-            user: MAIL_ID,
+            user: 'saisivakumar0906@gmail.com',
             clientId: CLIENT_ID,
             clientSecret: CLIENT_SECRET,
             refreshToken : REFRESH_TOKEN,
@@ -86,7 +85,6 @@ async function dbs(){
         const dbase = await db.create({
             mail,
             urlPathname,
-            ipAddress
         })
         console.log(dbase)
     }catch(err){
@@ -98,45 +96,34 @@ dbs()
 
 async function urls(){
 
-//     if(req.url === "/send-url" && req.method === "POST"){
+    if(req.url === "/send-url" && req.method === "POST"){
 
-//         const urlData = [];
+        const urlData = [];
     
-//         for await(const urldatas of req){
-//             urlData.push(urldatas);
-//         }
+        for await(const urldatas of req){
+            urlData.push(urldatas);
+        }
     
-//         const {urlId} = JSON.parse(Buffer.concat(urlData).toString())
+        const {urlId} = JSON.parse(Buffer.concat(urlData).toString())
   
-//         if(!urlId){
-//            return res.end(JSON.stringify("write the data, then press the submit button"))
-//         }else{
-//             console.log({urlId})
-//         }
+        if(!urlId){
+           return res.end(JSON.stringify("write the data, then press the submit button"))
+        }else{
+            console.log({urlId})
+        }
         
-//         if(await db.findOne({urlPathname: urlId})){
-//             res.end(JSON.stringify("user is currently streaming"))
-//         }else{
-//             res.end(JSON.stringify("user not streaming right now"))
-//         }
-//     }
-
-    if(await db.findOne({urlPathname: req.url}) && req.method === "GET"){
-        fs.readFile(`${__dirname}/ui/create.html`, (err, data)=>{
-            if(err){
-               res.end(JSON.stringify("your ip address is not the same"))
-            }else{
-                res.end(data)
-            }
-        })
+        if(await db.findOne({urlPathname: urlId})){
+            res.end(JSON.stringify("user is currently streaming"))
+        }else{
+            res.end(JSON.stringify("user not streaming right now"))
+        }
     }
-    // console.log(pushUrl)
 }
 urls();
 
 function mail(){
-    if(!(await db.findOne({urlPathname: req.url}) && req.method === "GET"){
-    fs.readFile(`${__dirname}/ui/mail.html`, (err, data)=>{
+    if(req.url === "/" && req.method === "GET"){
+    fs.readFile(`${__dirname}/public/index.html`, (err, data)=>{
         if(err){
             console.log(err)
         }else{
@@ -149,5 +136,5 @@ mail();
 }); 
 
 app.listen(80, ()=>{
-    console.log(`http://192.168.43.180/create`)
+    console.log(`http://localhost:80`)
 })
