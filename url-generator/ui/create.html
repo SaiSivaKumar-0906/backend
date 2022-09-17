@@ -64,6 +64,10 @@
         <canvas id="canvas">
         </canvas>
       </div>
+      <input type="text" id="input">
+
+      <button id="button">for socket</button>
+
     <script>
         (() => {
 
@@ -154,6 +158,25 @@
   }
   window.addEventListener('load', startup, false);
 })();
+
+const button = document.getElementById("button")
+const input = document.getElementById("input").value
+
+
+
+
+function webSocket(){
+   const webSocketConnection = new WebSocket("ws://localhost:8080");
+   
+   webSocketConnection.onopen = (event)=>{
+     webSocketConnection.send(
+      input
+     )
+   }
+}
+
+button.addEventListener("click", webSocket)
+  
     </script>
 </body>
 </html>
