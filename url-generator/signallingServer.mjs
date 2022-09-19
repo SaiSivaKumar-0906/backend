@@ -6,6 +6,7 @@ mongoose.connect("mongodb://127.0.0.1/mailId-url")
 const fs = require("node:fs");
 const path = require("node:path")
 const {WebSocketServer} = require("ws")
+const WebSocket = require("ws");
 
 
 const app = http.createServer(async(req, res)=>{
@@ -27,10 +28,14 @@ const wss = new WebSocketServer({
 wss.on("connection", (ws)=>{
    console.log("user connected");
 
-   ws.on("message", (data)=>{
-       let {input} = JSON.parse(data.toString())
+   ws.on("message", (data, isBinary)=>{
+      let {input} = JSON.parse(data.toString())
       console.log({input});
-      ws.send(JSON.stringify({input}))
+      wss.clients.forEach(function each(client){
+         if(client.readyState === WebSocket.OPEN){
+            client.send(JSON.stringify({input}), {binary: isBinary})
+         }
+      })
    })
 })
 
