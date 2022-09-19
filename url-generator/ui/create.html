@@ -14,12 +14,12 @@
 </div> 
   <input type="text" id="myText">
   <input type="submit"  id="socketConnection">
-  <p id="serverMessage"></p>
+  <ul id="serverMessage"></ul>
 <script>
 const video = document.querySelector("video");
   const constraints = {
   video:true,
-  };
+  };  
   
   navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
     video.srcObject = stream;
@@ -28,7 +28,9 @@ const video = document.querySelector("video");
   
   
   const socketConnection = document.getElementById("socketConnection");
-  
+  const para = document.getElementById("serverMessage");
+  const messages = []
+
   function ws(){
     const wss = new WebSocket("ws://localhost:9966");
   
@@ -39,12 +41,16 @@ const video = document.querySelector("video");
     }
   
     wss.onmessage = (event)=>{
-      const para = document.getElementById("serverMessage");
       let {input} = JSON.parse(event.data)
-      para.innerHTML = input
+      const li = document.createElement("li");
+      li.innerHTML = input
+      para.appendChild(li);
     }
   }
+
+
+  socketConnection.addEventListener("click", ws)
   
-  socketConnection.addEventListener("click", ws)</script>
+  </script>
 </body>
 </html>
