@@ -25,19 +25,29 @@ const wss = new WebSocketServer({
    server: app
 })
 
+
 wss.on("connection", (ws)=>{
    console.log("user connected");
 
    ws.on("message", (data, isBinary)=>{
-      let {input} = JSON.parse(data.toString())
-      console.log({input});
-      wss.clients.forEach(function each(client){
-         if(client.readyState === WebSocket.OPEN){
-            client.send(JSON.stringify({input}), {binary: isBinary})
+      try{
+         const {input} = JSON.parse(data);
+
+         console.log({input})
+
+         for(const client of wss.clients){
+            if(client.readyState === WebSocket.OPEN){
+               client.send(JSON.stringify({
+                  input
+               }), {binary: isBinary})
+            }
          }
-      })
+      }catch(e){
+         ws.send(JSON.stringify("server has blown away for some reason"))
+      }
    })
 })
+
 
 app.listen(9966, ()=>{
    console.log(8080)
