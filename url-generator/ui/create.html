@@ -12,9 +12,9 @@
  <div>
  
 </div> 
-  <input type="text" id="myText">
-  <input type="submit"  id="socketConnection">
-  <ul id="serverMessage"></ul>
+<textarea type="text" id="myText" rows="3" cols="35" style="resize:none"></textarea><br>
+<input type="submit"  id="socketConnection" >
+<ul id="serverMessage"></ul>
 <script>
 const video = document.querySelector("video");
   const constraints = {
@@ -25,18 +25,16 @@ const video = document.querySelector("video");
     video.srcObject = stream;
   });
   
-  
-  
   const socketConnection = document.getElementById("socketConnection");
   const para = document.getElementById("serverMessage");
   const messages = []
 
   function ws(){
     const wss = new WebSocket("ws://localhost:9966");
-  
+    const input = document.getElementById("myText").value;
     wss.onopen = (event)=>{
       wss.send(JSON.stringify({
-        input: document.getElementById("myText").value
+        input
       }))
     }
   
@@ -45,12 +43,10 @@ const video = document.querySelector("video");
       const li = document.createElement("li");
       li.innerHTML = input
       para.appendChild(li);
+      const reset = document.getElementById("myText").value = "";
     }
   }
-
-
   socketConnection.addEventListener("click", ws)
-  
   </script>
 </body>
 </html>
