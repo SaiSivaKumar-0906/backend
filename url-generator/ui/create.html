@@ -15,6 +15,7 @@
 <textarea type="text" id="myText" rows="3" cols="35" style="resize:none"></textarea><br>
 <input type="submit"  id="socketConnection" >
 <ul id="serverMessage"></ul>
+<p id="check-connection"></p>
 <script>
 const video = document.querySelector("video");
   const constraints = {
@@ -28,23 +29,25 @@ const video = document.querySelector("video");
   const socketConnection = document.getElementById("socketConnection");
   const para = document.getElementById("serverMessage");
   const messages = []
+  const p = document.getElementById("check-connection")
 
   function ws(){
     const wss = new WebSocket("ws://localhost:9966");
-    const input = document.getElementById("myText").value;
+    const data = document.getElementById("myText").value;
     wss.onopen = (event)=>{
       wss.send(JSON.stringify({
-        input
+        data
       }))
     }
-  
+
     wss.onmessage = (event)=>{
-      let {input} = JSON.parse(event.data)
+      let {data} = JSON.parse(event.data)
       const li = document.createElement("li");
-      li.innerHTML = input
+      li.innerHTML = data
       para.appendChild(li);
       const reset = document.getElementById("myText").value = "";
     }
+
   }
   socketConnection.addEventListener("click", ws)
   </script>
