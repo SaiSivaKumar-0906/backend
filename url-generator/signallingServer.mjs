@@ -4,12 +4,11 @@ const mongoose = require("mongoose");
 const db = require("./db/models")
 mongoose.connect("mongodb://127.0.0.1/mailId-url")
 const fs = require("node:fs");
-const path = require("node:path")
 const {WebSocketServer} = require("ws")
 const WebSocket = require("ws");
 
 
-const app = http.createServer(async(req, res)=>{
+const app = http.createServer(async(req, res)=>{   
     if(await db.findOne({urlPathname: req.url}) && req.method === "GET"){
        fs.readFile(`${__dirname}/public/create.html`, (err, data)=>{
          if(err){
@@ -25,28 +24,34 @@ const wss = new WebSocketServer({
    server: app
 })
 
+wss.on("connection", connections)
 
-wss.on("connection", (ws)=>{
-   console.log("user connected");
+const clients = new Array;
 
-   ws.on("message", (data, isBinary)=>{
-      try{
-         const {input} = JSON.parse(data);
+function connections(client){    
+   clients.push(client);
 
-         console.log({input})
+   function endClient(){
+      const post = clients.indexOf(client);
+      clients.splice(post, 1);
+      console.log("connection closed");
+   }
 
-         for(const client of wss.clients){
-            if(client.readyState === WebSocket.OPEN){
-               client.send(JSON.stringify({
-                  input
-               }), {binary: isBinary})
-            }
-         }
-      }catch(e){
-         ws.send(JSON.stringify("server has blown away for some reason"))
-      }
-   })
-})
+   function responce(data){
+      console.log(JSON.parse(data));
+      brodcast(JSON.parse(data))
+   }
+
+   client.on('message', responce);
+   client.on('close', endClient);
+}
+
+
+function brodcast(data){
+   for(c in clients){
+      clients[c].send(JSON.stringify(data))
+   }
+}
 
 
 app.listen(9966, ()=>{
