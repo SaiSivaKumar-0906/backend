@@ -25,30 +25,46 @@ const video = document.querySelector("video");
   navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
     video.srcObject = stream;
   });
-  
+
+
   const socketConnection = document.getElementById("socketConnection");
   const para = document.getElementById("serverMessage");
   const messages = []
   const p = document.getElementById("check-connection")
 
+function heartBeat(){
+  clearTimeout(this.pingTimeout);
+  this.pingTimeout = setTimeout(()=>{
+    this.terminate();
+  }, 30000 + 1000);
+}
+
   function ws(){
-    const wss = new WebSocket("ws://localhost:9966");
-    const data = document.getElementById("myText").value;
-    wss.onopen = (event)=>{
+    const wss = new WebSocket("ws://localhost:9966")
+    const input = document.getElementById("myText").value;
+    wss.onopen = ()=>{
       wss.send(JSON.stringify({
-        data
+        input
       }))
     }
 
     wss.onmessage = (event)=>{
-      let {data} = JSON.parse(event.data)
+      let {input} = JSON.parse(event.data)
       const li = document.createElement("li");
-      li.innerHTML = data
+      li.innerHTML = input
       para.appendChild(li);
       const reset = document.getElementById("myText").value = "";
     }
 
-  }
+    wss.on('open', heartBeat);
+    wss.on('ping', heartBeat);
+    wss.on('close', function clear(){
+      clearTimeout(this.pingTimeout)
+    })
+
+}
+
+
   socketConnection.addEventListener("click", ws)
   </script>
 </body>
