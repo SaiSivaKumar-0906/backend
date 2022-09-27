@@ -25,42 +25,48 @@ const wss = new WebSocketServer({
    server: app
 })
 
-const clients = new Array();
-
-function connections(client){ 
-
-   clients.push(client);
-
-   function endClient(){
-      const removedClient = clients.indexOf(client);
-      clients.splice(removedClient, 1);
-      console.log("connection closed");
-   }
-
-   async function responce(data){
-      const datas = JSON.parse(data)
-      brodcast(JSON.parse(data));
+wss.on("connection", (ws)=>{
+   ws.on("message", (data, isBinary)=>{
       try{
-         const happens = await socketMessages.create({
-            data
-         })
+         const {input} = JSON.parse(data);
+
+         console.log({input})
+
+         for(const client of wss.clients){
+            if(client.readyState === WebSocket.OPEN){
+               client.send(JSON.stringify({
+                  input
+               }), {binary: isBinary})
+            }
+         }
       }catch(e){
-         console.log(e)
+         ws.send(JSON.stringify("server has blown away for some reason"))
       }
-   }
+   })
+})
 
-   client.on('message', responce);
-   client.on('close', endClient);
+function heartbeat(){
+   this.isAlive = true;
 }
 
+wss.on("connection", function connection(ws){
+   ws.isAlive = true;
+   ws.on('pong', heartbeat);
+})
 
-function brodcast(data){
-   for(c in clients){
-      clients[c].send(JSON.stringify(data))
-   }
-}
+const interval = setInterval(function ping(){
+   wss.clients.forEach(function each(ws){
+      if(ws.isAlive === false) return ws.terminate();
 
-wss.on("connection", connections)
+      ws.isAlive = false;
+      ws.ping();
+      console.log("user got disconnected")
+   })
+}, 30000);
+
+wss.on('close', function close(){
+   clearInterval(interval)
+})
 
 app.listen(9966, ()=>{
    console.log(9966)
