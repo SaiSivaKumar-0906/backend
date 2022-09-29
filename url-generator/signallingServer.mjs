@@ -39,13 +39,6 @@ const clients = new Array();
    async function responce(data){
       console.log(JSON.parse(data))
       brodcast(JSON.parse(data));
-      try{
-         await socketMessages.create({
-            data
-         })
-      }catch(e){
-         console.log(e)
-      }
    }
 
    client.on('message', responce);
