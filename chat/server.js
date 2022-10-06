@@ -6,23 +6,24 @@ const WebSocket = require("ws");
 const app  = http.createServer();
 
 const wss = new WebSocketServer({
-    server: app
+   server: app
 })
 
-function sockets(){
-  wss.on("connection", (ws)=>{
-    ws.on("message", (data)=>{
-      const {socket} = JSON.parse(data);
-      wss.clients.forEach((client)=>{
-        if(client.readyState === WebSocket.OPEN){
-          client.send(JSON.stringify(socket))
-        }
-      })
+wss.on("connection", function(ws){
+  ws.on("message", (data)=>{
+    const {message} = JSON.parse(data)
+    console.log(message)
+    wss.clients.forEach((client)=>{
+      if(client.readyState === WebSocket.OPEN){ 
+       return client.send(JSON.stringify({
+        message
+      }))
+    }
     })
   })
-}
+})
 
-sockets()
+
 
 app.listen(80, ()=>{
     console.log(80)
