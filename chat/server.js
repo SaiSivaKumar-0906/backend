@@ -9,20 +9,41 @@ const wss = new WebSocketServer({
    server: app
 })
 
-wss.on("connection", function(ws){
-  ws.on("message", (data)=>{
-    const {message} = JSON.parse(data)
-    console.log(message)
-    wss.clients.forEach((client)=>{
-      if(client.readyState === WebSocket.OPEN){ 
-       return client.send(JSON.stringify({
-        message
-      }))
-    }
-    })
-  })
-})
 
+const clients = new Array();
+
+function connections(client){ 
+
+  clients.push(client);
+
+  function endClient(){
+    const removedClient = clients.indexOf(client);
+    clients.splice(removedClient, 1);
+    console.log("connection closed");
+  }
+
+  async function responce(data){
+    const {message} = JSON.parse(data)
+    
+    console.log(message)
+
+    brodcast(JSON.stringify(message));   
+  }
+
+  client.on('message', responce);
+  client.on('close', endClient);
+}
+
+
+function brodcast(data){
+  for(let i=0; i<clients.length; i++){
+    clients[i].send(data)
+  }
+}
+
+
+
+wss.on("connection", connections)
 
 
 app.listen(80, ()=>{
