@@ -9,12 +9,14 @@ const wss = new WebSocketServer({
    server: app
 })
 
-
 const clients = new Array();
 
 function connections(client){ 
 
   clients.push(client);
+
+  console.log(clients[clients.indexOf(client)] === client)
+  
 
   function endClient(){
     const removedClient = clients.indexOf(client);
@@ -24,8 +26,12 @@ function connections(client){
 
   async function responce(data){
     const {message} = JSON.parse(data)
+
+    if(!message){
+      return brodcast(JSON.stringify("send the data, I've no clue why this would pop up"));
+    }
     
-    console.log(message)
+    console.log({message})
 
     brodcast(JSON.stringify(message));   
   }
@@ -46,6 +52,7 @@ function brodcast(data){
 wss.on("connection", connections)
 
 
-app.listen(80, ()=>{
+
+app.listen(8080, ()=>{
     console.log(80)
 })
