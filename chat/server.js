@@ -9,49 +9,29 @@ const wss = new WebSocketServer({
    server: app
 })
 
-const clients = new Array();
+const array = new Array();
 
-function connections(client){ 
-
-  clients.push(client);
-
-  console.log(clients[clients.indexOf(client)] === client)
-  
-
-  function endClient(){
-    const removedClient = clients.indexOf(client);
-    clients.splice(removedClient, 1);
-    console.log("connection closed");
-  }
-
-  async function responce(data){
+wss.on("connection", (ws)=>{
+  array.push(ws)
+  ws.on("message", (data)=>{
     const {message} = JSON.parse(data)
+    wss.clients.forEach((client)=>{
+      if(client.readyState === WebSocket.OPEN){
+        client.send(JSON.stringify(message))
+      }      
+    })
+  })
+  ws.on("close", removedclinet)
+})
 
-    if(!message){
-      return brodcast(JSON.stringify("send the data, I've no clue why this would pop up"));
+function removedclinet(client){
+  for(let i=0; i<array.length; i++){
+    if(array[i] === client){
+      array.splice(i, 1)
     }
-    
-    console.log({message})
-
-    brodcast(JSON.stringify(message));   
   }
-
-  client.on('message', responce);
-  client.on('close', endClient);
+  console.log("disconnected")
 }
-
-
-function brodcast(data){
-  for(let i=0; i<clients.length; i++){
-    clients[i].send(data)
-  }
-}
-
-
-
-wss.on("connection", connections)
-
-
 
 app.listen(8080, ()=>{
     console.log(80)
