@@ -1,9 +1,26 @@
 const http = require("node:http");
 const { WebSocketServer } = require("ws");
-// const ws = require("ws")
+const ws = require("ws")
 const WebSocket = require("ws");
+const fs = require("node:fs")
 
-const app  = http.createServer();
+const app  = http.createServer((req, res)=>{
+  if(req.url === "/" && req.method === "GET"){
+    fs.readFile(`${__dirname}/public/index.html` , (err, data)=>{
+      try{
+        res.end(data)
+      }catch{
+        throw err
+      }
+    })
+  } 
+  if(req.url === "/api" && req.method === "GET"){
+     res.writeHead(302, {
+      "Location": "https://www.example.com"
+    })
+    res.end();
+  }
+});
 
 const wss = new WebSocketServer({
    server: app
@@ -20,9 +37,10 @@ wss.on("connection", (ws)=>{
         client.send(JSON.stringify(message))
       }      
     })
+    ws.on("close", removedclinet)
   })
-  ws.on("close", removedclinet)
 })
+
 
 function removedclinet(client){
   for(let i=0; i<array.length; i++){
