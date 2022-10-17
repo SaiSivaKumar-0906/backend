@@ -1,35 +1,36 @@
-  const http = require("node:http");
-  const { WebSocketServer } = require("ws");
-  const ws = require("ws")
-  const WebSocket = require("ws");
-  const fs = require("node:fs")
+const http = require("node:http");
+const { WebSocketServer } = require("ws");
+const ws = require("ws")
+const WebSocket = require("ws");
+const fs = require("node:fs")
+const random = "url";
 
-  const app  = http.createServer((req, res)=>{
-    if(req.url === "/" && req.method === "GET"){
-      fs.readFile(`${__dirname}/public/index.html` , (err, data)=>{
-        try{
-          res.end(data)
-        }catch{
-          throw err
-        }
-      })
-    } 
-    if(req.url === "/apis" && req.method === "GET"){
-      res.writeHead(302, {
-        "Location": "/public/index.html"
-      })
-      res.end()
-    }
-    if(req.url === "/public/index.html" && req.method === "GET"){
-      fs.readFile(`${__dirname}/public/websocket.html`, (err, data)=>{
-        if(err){
-          console.log(err)
-        }else{
-          res.end(data)
-        }
-      })
-    }
-  });
+const app  = http.createServer((req, res)=>{
+  if(req.url === "/" && req.method === "GET"){
+    fs.readFile(`${__dirname}/public/index.html` , (err, data)=>{
+      try{
+        res.end(data)
+      }catch{
+        throw err
+      }
+    })
+  } 
+  if(req.url === "/what" && req.method === "GET"){
+    fs.readFile(`${__dirname}/public/websocket.html`, (err, data)=>{
+      try{
+        res.end(data)
+      }catch{
+        err;
+      }
+    })
+  }
+  if(req.url === "/redirects" && req.method === "GET"){
+    res.writeHead(302, {
+      "Location": "/what"
+    })
+    res.end()
+  }
+});
 
   const wss = new WebSocketServer({
     server: app
@@ -47,6 +48,7 @@
         }      
       })
       ws.on("close", removedclinet)
+      console.log(message)
     })
   })
 
