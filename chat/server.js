@@ -3,9 +3,9 @@ const { WebSocketServer } = require("ws");
 const ws = require("ws")
 const WebSocket = require("ws");
 const fs = require("node:fs")
-const random = "url";
 
 const app  = http.createServer((req, res)=>{
+
   if(req.url === "/" && req.method === "GET"){
     fs.readFile(`${__dirname}/public/index.html` , (err, data)=>{
       try{
@@ -15,21 +15,29 @@ const app  = http.createServer((req, res)=>{
       }
     })
   } 
-  if(req.url === "/what" && req.method === "GET"){
+
+  if(req.url === "/websocket" && req.method === "GET"){
+    res.writeHead(200, {
+      "Content-type": "text/html",
+    })
     fs.readFile(`${__dirname}/public/websocket.html`, (err, data)=>{
-      try{
-        res.end(data)
+      try {
+        res.write(data);
+        res.end();
       }catch{
-        err;
+        throw err;
       }
     })
   }
+
   if(req.url === "/redirects" && req.method === "GET"){
     res.writeHead(302, {
-      "Location": "/what"
+      "Location": "/websocket", 
+      "Content-type": "text/html"
     })
-    res.end()
+    res.end();
   }
+
 });
 
   const wss = new WebSocketServer({
