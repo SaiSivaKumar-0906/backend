@@ -3,6 +3,12 @@ const { WebSocketServer } = require("ws");
 const ws = require("ws")
 const WebSocket = require("ws");
 const fs = require("node:fs")
+const crypto = require("node:crypto");
+const url = require("node:url");
+
+const urlParse = crypto.randomBytes(32).toString('hex');
+
+const urlPathName = url.parse(urlParse);
 
 const app  = http.createServer((req, res)=>{
 
@@ -16,7 +22,7 @@ const app  = http.createServer((req, res)=>{
     })
   } 
 
-  if(req.url === "/websocket" && req.method === "GET"){
+  if(req.url === `/users/${urlPathName.pathname}` && req.method === "GET"){
     res.writeHead(200, {
       "Content-type": "text/html",
     })
@@ -31,9 +37,8 @@ const app  = http.createServer((req, res)=>{
   }
 
   if(req.url === "/redirects" && req.method === "GET"){
-    res.writeHead(302, {
-      "Location": "/websocket", 
-      "Content-type": "text/html"
+    res.writeHead(307, {
+      "Location": `/users/${urlPathName.pathname}`, 
     })
     res.end();
   }
