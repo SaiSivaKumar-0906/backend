@@ -10,6 +10,17 @@ const urlParse = crypto.randomBytes(32).toString('hex');
 
 const urlPathName = url.parse(urlParse);
 
+function time (){
+  const createdTime = Math.round(+new Date()/1000);
+  return createdTime;
+}
+
+function urlGeneration(){
+ return time();
+}
+
+urlGeneration();
+
 const app  = http.createServer((req, res)=>{
 
   if(req.url === "/" && req.method === "GET"){
