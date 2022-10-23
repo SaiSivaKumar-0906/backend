@@ -22,7 +22,6 @@ function urlGeneration(){
 const app  = http.createServer((req, res)=>{
 
   if(req.url === "/" && req.method === "GET"){
-    console.log(req.socket.remoteAddress);
     fs.readFile(`${__dirname}/public/index.html` , (err, data)=>{
       try{
         res.end(data)
@@ -47,6 +46,8 @@ const app  = http.createServer((req, res)=>{
   }
 
   if(req.url === "/redirects" && req.method === "GET"){
+    const time = urlGeneration();
+    console.log(time);
     res.writeHead(307, {
       "Location": `/users/${urlPathName.pathname}`, 
     })
