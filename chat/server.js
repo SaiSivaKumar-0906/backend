@@ -36,10 +36,10 @@ const app  = http.createServer(async(req, res)=>{
   }
 
   if(req.url === "/redirects" && req.method === "GET"){
-    const urlParse  = url.parse(crypto.randomUUID());
+    const urlParse  = url.parse(Math.round(+new Date()/1000).toString())
 
     const urlPathName = urlParse.pathname;
-    
+
     try{
       const dbs = await db.create({
         url: urlPathName
