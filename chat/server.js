@@ -5,21 +5,15 @@ const WebSocket = require("ws");
 const fs = require("node:fs")
 const crypto = require("node:crypto");
 const url = require("node:url");
+const mongoose = require("mongoose");
+mongoose.connect("mongodb://127.0.0.1:/websocket-url")
+const db = require("../chat/db/urlDB")
 
-const urlParse = crypto.randomBytes(32).toString('hex');
 
-const urlPathName = url.parse(urlParse);
+let passed = "it will store urls";
 
-function time (){
-  const createdTime = Math.round(+new Date()/1000);
-  return createdTime;
-}
 
-function urlGeneration(){
- return time();
-}
-
-const app  = http.createServer((req, res)=>{
+const app  = http.createServer(async(req, res)=>{
 
   if(req.url === "/" && req.method === "GET"){
     fs.readFile(`${__dirname}/public/index.html` , (err, data)=>{
@@ -31,7 +25,7 @@ const app  = http.createServer((req, res)=>{
     })
   } 
 
-  if(req.url === `/users/${urlPathName.pathname}` && req.method === "GET"){
+  if(await db.find({url: req.url}) && req.method === "GET"){
     res.writeHead(200, {
       "Content-type": "text/html",
     })
@@ -46,10 +40,23 @@ const app  = http.createServer((req, res)=>{
   }
 
   if(req.url === "/redirects" && req.method === "GET"){
-    const time = urlGeneration();
-    console.log(time);
+    const urlParse  = url.parse(crypto.randomUUID());
+
+    const urlPathName = urlParse.pathname;
+
+    trailWillPass = urlPathName;
+
+    try{
+      const dbs = await db.create({
+        url: trailWillPass
+      })
+      console.log(dbs)
+    }catch(err){
+      throw err;
+    }
+
     res.writeHead(307, {
-      "Location": `/users/${urlPathName.pathname}`, 
+      "Location": `/users/${trailWillPass}`, 
     })
     res.end();
   }
