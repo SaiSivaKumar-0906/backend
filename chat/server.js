@@ -9,10 +9,6 @@ const mongoose = require("mongoose");
 mongoose.connect("mongodb://127.0.0.1:/websocket-url")
 const db = require("../chat/db/urlDB")
 
-
-let passed = "it will store urls";
-
-
 const app  = http.createServer(async(req, res)=>{
 
   if(req.url === "/" && req.method === "GET"){
@@ -43,12 +39,10 @@ const app  = http.createServer(async(req, res)=>{
     const urlParse  = url.parse(crypto.randomUUID());
 
     const urlPathName = urlParse.pathname;
-
-    trailWillPass = urlPathName;
-
+    
     try{
       const dbs = await db.create({
-        url: trailWillPass
+        url: urlPathName
       })
       console.log(dbs)
     }catch(err){
@@ -56,7 +50,7 @@ const app  = http.createServer(async(req, res)=>{
     }
 
     res.writeHead(307, {
-      "Location": `/users/${trailWillPass}`, 
+      "Location": `/users/${urlPathName}`, 
     })
     res.end();
   }
