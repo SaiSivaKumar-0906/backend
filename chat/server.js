@@ -3,6 +3,7 @@ const { WebSocketServer } = require("ws");
 const ws = require("ws")
 const WebSocket = require("ws");
 const fs = require("node:fs")
+const crypto = require("node:crypto");
 const url = require("node:url");
 const mongoose = require("mongoose");
 mongoose.connect("mongodb://127.0.0.1:/websocket-url")
@@ -20,7 +21,27 @@ const app  = http.createServer(async(req, res)=>{
     })
   } 
 
-  if(await db.find({url: req.url}) && req.method === "GET"){
+  if(req.url === "/redirects" && req.method === "GET"){
+    const urlParse  = url.parse(crypto.randomUUID())
+
+    const urlPathName = urlParse.pathname;
+
+    res.writeHead(307, {
+      "Location": `/users/${urlPathName}`, 
+    })
+    res.end();
+
+    try{
+      const dbs = await db.create({
+        url: `users/${urlPathName}`
+      })
+      console.log(dbs)
+    }catch(err){
+      throw err;
+    }
+  }
+
+  if(await db.find({url: req.url}) === req.url && req.method === "GET"){
     res.writeHead(200, {
       "Content-type": "text/html",
     })
@@ -32,26 +53,6 @@ const app  = http.createServer(async(req, res)=>{
         throw err;
       }
     })
-  }
-
-  if(req.url === "/redirects" && req.method === "GET"){
-    const urlParse  = url.parse(Math.round(+new Date()/1000).toString())
-
-    const urlPathName = urlParse.pathname;
-
-    try{
-      const dbs = await db.create({
-        url: urlPathName
-      })
-      console.log(dbs)
-    }catch(err){
-      throw err;
-    }
-
-    res.writeHead(307, {
-      "Location": `/users/${urlPathName}`, 
-    })
-    res.end();
   }
 
 });
@@ -86,6 +87,6 @@ const app  = http.createServer(async(req, res)=>{
     console.log("disconnected")
   }
 
-  app.listen(8080, ()=>{
-      console.log(80)
-  })
+app.listen(8080, ()=>{
+  console.log(80)
+})
