@@ -41,7 +41,7 @@ const app  = http.createServer(async(req, res)=>{
     }
   }
 
-  if(await db.find({url: req.url}) === req.url && req.method === "GET"){
+  if(await db.find({url: req.url}) && req.method === "GET"){
     res.writeHead(200, {
       "Content-type": "text/html",
     })
