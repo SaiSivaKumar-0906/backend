@@ -104,10 +104,3 @@ function query(url){
 app.listen(80, ()=>{
   console.log(80)
 })
-
-
-async function willTry(){
-  return console.log(await db.findOne({url: "users/10059481-b9f6-4200-9b48-7d229c8359ab"}));
-} 
-
-console.log(willTry().then(e=>e))
