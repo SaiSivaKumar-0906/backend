@@ -33,7 +33,7 @@ const app  = http.createServer(async(req, res)=>{
 
     try{
       const dbs = await db.create({
-        url: `users/${urlPathName}`
+        url: `/users/${urlPathName}`
       })
       console.log(dbs)
     }catch(err){
@@ -41,21 +41,35 @@ const app  = http.createServer(async(req, res)=>{
     }
   }
 
-  if(await db.find({url: req.url}) && req.method === "GET"){
-    res.writeHead(200, {
-      "Content-type": "text/html",
-    })
-    fs.readFile(`${__dirname}/public/websocket.html`, (err, data)=>{
-      try {
-        res.write(data);
-        res.end();
-      }catch{
-        throw err;
-      }
-    })
+  if(req.method === "GET"){
+    if(req.url === query(req.url)){      
+      res.writeHead(200, {
+        "Content-type": "text/html",
+      })
+      fs.readFile(`${__dirname}/public/websocket.html`, (err, data)=>{
+        try {
+          res.write(data);
+          res.end();
+        }catch{
+          throw err;
+        }
+      })
+    }
   }
 
 });
+
+function query(url){
+  const queryUrl = db.findOne({"url": url}, function(err, data){
+    if(data.url === url){
+      data
+    }else{
+      throw err;
+    }
+  })
+  return queryUrl["_conditions"]["url"]
+}
+
 
   const wss = new WebSocketServer({
     server: app
@@ -87,7 +101,7 @@ const app  = http.createServer(async(req, res)=>{
     console.log("disconnected")
   }
 
-app.listen(8080, ()=>{
+app.listen(80, ()=>{
   console.log(80)
 })
 
