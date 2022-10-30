@@ -59,15 +59,9 @@ const app  = http.createServer(async(req, res)=>{
 
 });
 
-function query(url){
-  const queryUrl = db.findOne({"url": url}, function(err, data){
-    if(data.url === url){
-      data
-    }else{
-      throw err;
-    }
-  })
-  return queryUrl["_conditions"]["url"]
+async function query(url){
+   const dburl = await db.findOne({"dbsUrl": url})
+   return dburl.dbsUrl
 }
 
 
