@@ -7,6 +7,42 @@
     <title>Document</title>
 </head>
 <body>
-    <button>will it work?</button>
+
+<textarea type="text" id="myText" rows="3" cols="35" style="resize:none"></textarea><br>
+<input type="submit"  id="socketConnection" />
+<ul id="serverMessage"></ul>
+
+
+<script>
+
+
+const socketConnection = document.getElementById("socketConnection");
+const para = document.getElementById("serverMessage");
+
+function ws(){
+    const wss = new WebSocket("ws://localhost:80")
+    
+    const wsMessage = document.getElementById("myText").value;
+
+    wss.onopen = ()=>{
+      wss.send(JSON.stringify({
+        wsMessage
+      }))
+    }
+
+    wss.addEventListener("message", (event)=>{
+        let {wsMessage} = JSON.parse(event.data)
+        const li = document.createElement("li");
+        li.innerHTML = wsMessage.toString()
+        para.appendChild(li);
+        const reset = document.getElementById("myText").value = "";
+    })
+    
+
+}
+    
+socketConnection.addEventListener("click", ws)
+
+  </script>
 </body>
 </html>
