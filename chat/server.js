@@ -41,8 +41,7 @@ const app  = http.createServer(async(req, res)=>{
     }
   }
 
-  if(req.method === "GET"){
-    if(req.url === query(req.url)){      
+  if(req.method === "GET" && await db.findOne({"url": req.url})){      
       res.writeHead(200, {
         "Content-type": "text/html",
       })
@@ -54,15 +53,9 @@ const app  = http.createServer(async(req, res)=>{
           throw err;
         }
       })
-    }
   }
 
 });
-
-async function query(url){
-   const dburl = await db.findOne({"dbsUrl": url})
-   return dburl.dbsUrl
-}
 
 
   const wss = new WebSocketServer({
@@ -98,3 +91,4 @@ async function query(url){
 app.listen(80, ()=>{
   console.log(80)
 })
+
