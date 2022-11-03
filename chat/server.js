@@ -6,8 +6,8 @@ const fs = require("node:fs")
 const crypto = require("node:crypto");
 const url = require("node:url");
 const mongoose = require("mongoose");
-mongoose.connect("mongodb://127.0.0.1:/websocket-url")
-const db = require("../chat/db/urlDB")
+mongoose.connect("mongodb://127.0.0.1:/websocket-url");
+const db = require("../chat/db/urlDB");
 
 const app  = http.createServer(async(req, res)=>{
 
@@ -41,7 +41,9 @@ const app  = http.createServer(async(req, res)=>{
     }
   }
 
-  if(req.method === "GET" && await db.findOne({"url": req.url})){      
+  if(req.method === "GET" &&  await db.findOne({"url": req.url})){  
+      const urlQuery = await db.findOne({"url": req.url});
+      console.log(urlQuery.url === req.url)
       res.writeHead(200, {
         "Content-type": "text/html",
       })
@@ -53,8 +55,7 @@ const app  = http.createServer(async(req, res)=>{
           throw err;
         }
       })
-  }
-
+    }  
 });
 
 
@@ -62,31 +63,18 @@ const app  = http.createServer(async(req, res)=>{
     server: app
   })
 
-  const array = new Array();
 
   wss.on("connection", (ws)=>{
-    array.push(ws)
-    ws.on("message", (data)=>{
-      const {message} = JSON.parse(data)
+    ws.on("message", (data, isBinary)=>{
       wss.clients.forEach((client)=>{
         if(client.readyState === WebSocket.OPEN){
-          client.send(JSON.stringify(message))
-        }      
+            client.send(data, {binary:isBinary}, ()=>{
+              console.log(data.toString())
+            })
+        }
       })
-      ws.on("close", removedclinet)
-      console.log(message)
     })
   })
-
-
-  function removedclinet(client){
-    for(let i=0; i<array.length; i++){
-      if(array[i] === client){
-        array.splice(i, 1)
-      }
-    }
-    console.log("disconnected")
-  }
 
 app.listen(80, ()=>{
   console.log(80)
