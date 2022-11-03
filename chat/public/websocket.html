@@ -11,7 +11,7 @@
 <textarea type="text" id="myText" rows="3" cols="35" style="resize:none"></textarea><br>
 <input type="submit"  id="socketConnection" />
 <ul id="serverMessage"></ul>
-
+<p id="shit"></p>
 
 <script>
 
@@ -25,15 +25,13 @@ function ws(){
     const wsMessage = document.getElementById("myText").value;
 
     wss.onopen = ()=>{
-      wss.send(JSON.stringify({
-        wsMessage
-      }))
+      wss.send(wsMessage)
     }
 
     wss.addEventListener("message", (event)=>{
-        let {wsMessage} = JSON.parse(event.data)
+        let sendingMessage = event.data;
         const li = document.createElement("li");
-        li.innerHTML = wsMessage.toString()
+        li.innerHTML = sendingMessage
         para.appendChild(li);
         const reset = document.getElementById("myText").value = "";
     })
