@@ -42,8 +42,6 @@ const app  = http.createServer(async(req, res)=>{
   }
 
   if(req.method === "GET" &&  await db.findOne({"url": req.url})){  
-      const urlQuery = await db.findOne({"url": req.url});
-      console.log(urlQuery.url === req.url)
       res.writeHead(200, {
         "Content-type": "text/html",
       })
@@ -60,23 +58,38 @@ const app  = http.createServer(async(req, res)=>{
 
 
   const wss = new WebSocketServer({
-    server: app
+    server: app,
   })
 
 
-  wss.on("connection", (ws)=>{
-    ws.on("message", (data, isBinary)=>{
-      wss.clients.forEach((client)=>{
-        if(client.readyState === WebSocket.OPEN){
-            client.send(data, {binary:isBinary}, ()=>{
-              console.log(data.toString())
-            })
-        }
-      })
+
+
+wss.brodcast = function brodcast(messages){
+  try{
+    wss.clients.forEach((clients)=>{
+      if(clients.readyState === WebSocket.OPEN){
+         clients.send(messages.toString())
+      }
     })
+  }catch(e){
+    console.log(e);
+  }
+}
+
+wss.on("connection", (ws)=>{
+  ws.on("message", (data)=>{
+    const {webSocketMessages} = JSON.parse(data);
+
+    console.log(webSocketMessages)
+
+    wss.brodcast(JSON.stringify({webSocketMessages}));
   })
+})
+
+
+
+
 
 app.listen(80, ()=>{
   console.log(80)
 })
-
