@@ -18,26 +18,26 @@
 
 const socketConnection = document.getElementById("socketConnection");
 const para = document.getElementById("serverMessage");
+const wss = new WebSocket("ws://localhost:80")  
 
 function ws(){
-    const wss = new WebSocket("ws://localhost:80")
     
-    const wsMessage = document.getElementById("myText").value;
+  const webSocketMessages = document.getElementById("myText").value;
+  
+  const wss = new WebSocket("ws://localhost:80")  
 
-    wss.onopen = ()=>{
-      wss.send(wsMessage)
-    }
+  wss.onopen = ()=>{
+    wss.send(JSON.stringify({webSocketMessages}))
+  } 
+} 
 
-    wss.addEventListener("message", (event)=>{
-        let sendingMessage = event.data;
-        const li = document.createElement("li");
-        li.innerHTML = sendingMessage
-        para.appendChild(li);
-        const reset = document.getElementById("myText").value = "";
-    })
-    
-
-}
+  wss.addEventListener("message", (event)=>{
+    let {webSocketMessages} = JSON.parse(event.data)
+    const li = document.createElement("li");
+    li.innerHTML = webSocketMessages
+    para.appendChild(li);
+    const reset = document.getElementById("myText").value = "";
+  })        
     
 socketConnection.addEventListener("click", ws)
 
