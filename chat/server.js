@@ -77,23 +77,29 @@ wss.brodcast = function brodcast(messages){
 }
 
 wss.on("connection", (ws)=>{
-  ws.on("message", (data)=>{
-    const {webSocketMessages} = JSON.parse(data);
-    
-    if(!webSocketMessages){
-      return;
-    }
 
-    console.log(webSocketMessages)
+  console.log(wss.clients.size)
 
-    wss.brodcast(JSON.stringify({webSocketMessages}));
-  })
+  if(wss.clients.size <= 2){
+    ws.on("message", (data)=>{
+
+      const {webSocketMessages} = JSON.parse(data);
+  
+      if(!webSocketMessages){
+        return;
+      }
+  
+      console.log(webSocketMessages)
+  
+      if(wss.clients.size <= 2){
+        wss.brodcast(JSON.stringify({webSocketMessages}));
+      }
+    })
+  }
 })
 
 
 
-
-
-app.listen(80, ()=>{
+app.listen(8080, ()=>{
   console.log(80)
 })
