@@ -79,6 +79,10 @@ wss.brodcast = function brodcast(messages){
 wss.on("connection", (ws)=>{
   ws.on("message", (data)=>{
     const {webSocketMessages} = JSON.parse(data);
+    
+    if(!webSocketMessages){
+      return;
+    }
 
     console.log(webSocketMessages)
 
