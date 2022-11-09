@@ -7,7 +7,13 @@ const crypto = require("node:crypto");
 const url = require("node:url");
 const db = require("../chat/db/urlDB");
 const mongoose = require("mongoose");
-mongoose.connect(url)
+const AtlasUrl = "mongodb+srv://siva:CGTWZAanEwmYoUp8@cluster0.zdt5qfc.mongodb.net/?retryWrites=true&w=majority"
+mongoose.connect(AtlasUrl)
+ .then(()=>{
+  console.log("conneted to db")
+}).catch((err)=>{
+  console.log(err);
+})
 
 const app  = http.createServer(async(req, res)=>{
 
@@ -35,7 +41,9 @@ const app  = http.createServer(async(req, res)=>{
 
     try{
       const dbs = await db.create({
-        url: `/users/${urlPathName}`  
+        url: `/users/${urlPathName}`, 
+        tweleCharacters:  `/users/${urlPathName}`.substring(31),
+        countNumber: 0
       })
       console.log(dbs)
     }catch(err){
@@ -44,33 +52,39 @@ const app  = http.createServer(async(req, res)=>{
   }
 
   if(req.method === "GET" &&  await db.findOne({"url": req.url})){  
-      res.writeHead(200, {
-        "Content-type": "text/html",
-      })
-      fs.readFile(`${__dirname}/public/websocket.html`, (err, data)=>{
-        try {
-          res.write(data);
-          res.end();
-        }catch{
-          throw err;
-        }
-      })
-    }  
-});
+    const tweleCharacters = req.url.substring(31);
 
+    if(await db.findOne({"tweleCharacters": tweleCharacters})){
+        res.writeHead(200, {
+          "Content-type": "text/html",
+        })
+        fs.readFile(`${__dirname}/public/websocket.html`, (err, data)=>{
+          try {
+            res.write(data);
+            res.end();
+          }catch{
+            throw err;
+          }
+        })
+    }else{
+      res.writeHead(404, {
+        "Content-Type": "text/html"
+      })
+      res.write("It already using by two members!!");
+      res.end();
+    }
+  }  
+});
 
   const wss = new WebSocketServer({
     server: app,
   })
 
-
-
-
 wss.brodcast = function brodcast(messages){
   try{
     wss.clients.forEach((clients)=>{
       if(clients.readyState === WebSocket.OPEN){
-         clients.send(messages.toString())
+        clients.send(messages.toString())
       }
     })
   }catch(e){
@@ -79,8 +93,6 @@ wss.brodcast = function brodcast(messages){
 }
 
 wss.on("connection", (ws)=>{
-
-  console.log(wss.clients.size)
 
   if(wss.clients.size <= 2){
     ws.on("message", (data)=>{
@@ -105,3 +117,13 @@ wss.on("connection", (ws)=>{
 app.listen(8080, ()=>{
   console.log(80)
 })
+
+
+
+async function udate(){
+  const updates = await db.findOne({"url": "/users/27400c8c-33da-42cf-8dc5-e82cf1fce983"});
+  await db.findOneAndUpdate(updates);
+  return console.log(value)
+}
+
+udate();
