@@ -7,6 +7,7 @@ const crypto = require("node:crypto");
 const url = require("node:url");
 const db = require("../chat/db/urlDB");
 const mongoose = require("mongoose");
+const AtlasUrl = "mongodb+srv://siva:CGTWZAanEwmYoUp8@cluster0.zdt5qfc.mongodb.net/?retryWrites=true&w=majority"
 mongoose.connect(AtlasUrl)
  .then(()=>{
   console.log("conneted to db")
@@ -15,7 +16,6 @@ mongoose.connect(AtlasUrl)
 })
 
 const app  = http.createServer(async(req, res)=>{
-
   if(req.url === "/" && req.method === "GET"){
     fs.readFile(`${__dirname}/public/index.html` , (err, data)=>{
       try{
@@ -27,17 +27,12 @@ const app  = http.createServer(async(req, res)=>{
   } 
 
   if(req.url === "/redirects" && req.method === "GET"){
-  
     const urlParse  = url.parse(crypto.randomUUID())
-
-    const urlPathName = urlParse.pathname;
-    
-
+    const urlPathName = urlParse.pathname;   
     res.writeHead(307, {
       "Location": `/users/${urlPathName}`, 
     })
     res.end();
-
     try{
       const dbs = await db.create({
         url: `/users/${urlPathName}`, 
@@ -51,11 +46,9 @@ const app  = http.createServer(async(req, res)=>{
   }
 
   if(req.method === "GET" &&  await db.findOne({"url": req.url})){  
-
     res.writeHead(200, {
       "Content-type": "text/html",
     })
-
       fs.readFile(`${__dirname}/public/websocket.html`, (err, data)=>{
         try {
           res.write(data);
@@ -67,9 +60,9 @@ const app  = http.createServer(async(req, res)=>{
   }  
 });
 
-  const wss = new WebSocketServer({
-    server: app,
-  })
+const wss = new WebSocketServer({
+  server: app,
+})
 
 wss.brodcast = function brodcast(messages){
   try{
@@ -84,21 +77,15 @@ wss.brodcast = function brodcast(messages){
 }
 
 wss.on("connection", (ws)=>{
-    ws.on("message", (data)=>{
-
-      const {webSocketMessages} = JSON.parse(data);
-  
+  ws.on("message", (data)=>{
+    const {webSocketMessages} = JSON.parse(data); 
       if(!webSocketMessages){
         return;
-      }
-  
-      console.log(webSocketMessages)
-  
-      wss.brodcast(JSON.stringify({webSocketMessages}));
+      } 
+    console.log(webSocketMessages)  
+    wss.brodcast(JSON.stringify({webSocketMessages}));
     })
 })
-
-
 
 app.listen(8080, ()=>{
   console.log(80)
