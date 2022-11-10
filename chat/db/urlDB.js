@@ -5,14 +5,6 @@ const models = mongoose.Schema({
         type: String,
         require: true
     }, 
-    tweleCharacters:{
-        type: String,
-        require: true
-    },
-    countNumber:{
-        type: Number,
-        require: true
-    }
 })
 
 const dbs = mongoose.model("urls", models);
