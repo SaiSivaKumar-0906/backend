@@ -45,6 +45,7 @@ const app  = http.createServer(async(req, res)=>{
   }
 
   if(req.method === "GET" &&  await db.findOne({"url": req.url})){  
+    console.log(wss.clients.size  )
     res.writeHead(200, {
       "Content-type": "text/html",
     })
@@ -54,7 +55,7 @@ const app  = http.createServer(async(req, res)=>{
           res.end();
         }catch{
           throw err;
-          }
+        }
       })
   }  
 });
@@ -81,7 +82,7 @@ wss.on("connection", (ws)=>{
       if(!webSocketMessages){
         return;
       } 
-    console.log(webSocketMessages)  
+    console.log(webSocketMessages) 
     wss.brodcast(JSON.stringify({webSocketMessages}));
     })
 })
