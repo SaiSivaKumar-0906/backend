@@ -7,7 +7,8 @@ const crypto = require("node:crypto");
 const url = require("node:url");
 const db = require("../chat/db/urlDB");
 const mongoose = require("mongoose");
-mongoose.connect(AtlasUrl)
+const { findOne } = require("../chat/db/urlDB");
+mongoose.connect("mongodb://127.0.0.1:27017/websocket-url")
  .then(()=>{
   console.log("conneted to db")
 }).catch((err)=>{
@@ -35,8 +36,6 @@ const app  = http.createServer(async(req, res)=>{
     try{
       const dbs = await db.create({
         url: `/users/${urlPathName}`, 
-        tweleCharacters:  `/users/${urlPathName}`.substring(31),
-        countNumber: 0
       })
       console.log(dbs)
     }catch(err){
@@ -44,8 +43,7 @@ const app  = http.createServer(async(req, res)=>{
     }
   }
 
-  if(req.method === "GET" &&  await db.findOne({"url": req.url})){  
-    console.log(wss.clients.size  )
+  if(req.method === "GET" &&  await db.findOne({"url": req.url})){
     res.writeHead(200, {
       "Content-type": "text/html",
     })
