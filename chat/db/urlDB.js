@@ -3,8 +3,12 @@ const mongoose = require("mongoose");
 const models = mongoose.Schema({
     url:{
         type: String,
-        require: true
+        unique: true
     }, 
+    ip:{
+        type: Array, 
+        require: true
+    }
 })
 
 const dbs = mongoose.model("urls", models);
