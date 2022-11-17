@@ -7,7 +7,8 @@ const crypto = require("node:crypto");
 const url = require("node:url");
 const db = require("../chat/db/urlDB");
 const mongoose = require("mongoose");
-mongoose.connect("mongodb://127.0.0.1:27017/websocket-url")
+const AtlasUrl = "mongodb+srv://siva:CGTWZAanEwmYoUp8@cluster0.zdt5qfc.mongodb.net/?retryWrites=true&w=majority"
+mongoose.connect(AtlasUrl)
  .then(()=>{
   console.log("conneted to db")
 }).catch((err)=>{
@@ -17,7 +18,8 @@ mongoose.connect("mongodb://127.0.0.1:27017/websocket-url")
 function IndexFile(res){
   return fs.readFile(`${__dirname}/public/index.html` , (err, data)=>{
     try{
-      res.end(data)
+      res.write(data);
+      res.end();
     }catch{
       throw err
     }
@@ -63,9 +65,11 @@ function FourOfour(res){
   res.end();
 }
 
+
 const app  = http.createServer(async(req, res)=>{
-  const dbUrl = await db.findOne({"url":req.url});
-  if(req.url === "/" && req.method === "GET"){
+  const dbUrl = await db.findOne({"url":req.url})
+  
+  if(req.url==="/" && req.method === "GET"){
     IndexFile(res);
   } 
 
@@ -75,11 +79,11 @@ const app  = http.createServer(async(req, res)=>{
 
   if(dbUrl){
     WebSocketFile(res)
-  }  
-
-  if(!dbUrl){
-    FourOfour(res)
   }
+
+  // if(req.url !== `/users/${subString}`){
+  //   FourOfour(res);
+  // }
 });
 
 const wss = new WebSocketServer({
