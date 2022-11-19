@@ -26,7 +26,7 @@ function IndexFile(res){
 }
 
 async function CreatingUser(res){
-  const urlParse  = url.parse(crypto.randomUUID())
+  const urlParse  = url.parse(crypto.randomUUID());
   const urlPathName = urlParse.pathname;   
   res.writeHead(307, {
     "Location": `/users/${urlPathName}`, 
@@ -56,18 +56,9 @@ function WebSocketFile(res){
   })
 }
 
-function FourOfour(res){
-  res.writeHead(404, {
-    "Content-Type": "text/html"
-  })
-  res.write("Does Not exist");
-  res.end();
-}
-
-
 const app  = http.createServer(async(req, res)=>{
   const dbUrl = await db.findOne({"url":req.url})
-  
+
   if(req.url==="/" && req.method === "GET"){
     IndexFile(res);
   } 
@@ -79,10 +70,6 @@ const app  = http.createServer(async(req, res)=>{
   if(dbUrl){
     WebSocketFile(res)
   }
-
-  // if(req.url !== `/users/${subString}`){
-  //   FourOfour(res);
-  // }
 });
 
 const wss = new WebSocketServer({
