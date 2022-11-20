@@ -17,6 +17,9 @@ mongoose.connect(AtlasUrl)
 function IndexFile(res){
   return fs.readFile(`${__dirname}/public/index.html` , (err, data)=>{
     try{
+      res.writeHead(200, {
+        "Content-Type": "text/html"
+      })
       res.write(data);
       res.end();
     }catch{
@@ -56,21 +59,32 @@ function WebSocketFile(res){
   })
 }
 
-const app  = http.createServer(async(req, res)=>{
-  const dbUrl = await db.findOne({"url":req.url})
+function fourOfour(res){
+  res.writeHead(404, {
+    "Content-Type": "text/html"
+  })
+  res.write("Does not exist");
+  res.end();
+}
 
-  if(req.url==="/" && req.method === "GET"){
+const app  = http.createServer(async(req, res)=>{
+  if(req.url==="/" && req.method === "GET"){  
     IndexFile(res);
-  } 
+  }
 
   if(req.url === "/redirects" && req.method === "GET"){
     CreatingUser(res);
   }
 
-  if(dbUrl){
-    WebSocketFile(res)
+  if(await db.findOne({"url":req.url})){
+    WebSocketFile(res);
+  }
+
+  if(!await db.findOne({"url":req.url})){
+    fourOfour(res);
   }
 });
+
 
 const wss = new WebSocketServer({
   server: app,
