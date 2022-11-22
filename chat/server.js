@@ -7,6 +7,7 @@ const crypto = require("node:crypto");
 const url = require("node:url");
 const db = require("../chat/db/urlDB");
 const mongoose = require("mongoose");
+const AtlasUrl = "mongodb+srv://siva:CGTWZAanEwmYoUp8@cluster0.zdt5qfc.mongodb.net/?retryWrites=true&w=majority"
 mongoose.connect(AtlasUrl)
  .then(()=>{
   console.log("conneted to db")
@@ -26,7 +27,7 @@ function IndexFile(res){
       throw err
     }
   })
-}
+} 
 
 async function CreatingUser(res){
   const urlParse  = url.parse(crypto.randomUUID());
