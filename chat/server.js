@@ -1,13 +1,12 @@
 const http = require("node:http");
 const { WebSocketServer } = require("ws");
-const ws = require("ws")
 const WebSocket = require("ws");
 const fs = require("node:fs")
 const crypto = require("node:crypto");
 const url = require("node:url");
 const db = require("../chat/db/urlDB");
 const mongoose = require("mongoose");
-mongoose.connect(AtlasUrl)
+"mongoose.connect(AtlasUrl)
  .then(()=>{
   console.log("conneted to db")
 }).catch((err)=>{
