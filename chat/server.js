@@ -7,6 +7,7 @@ const crypto = require("node:crypto");
 const url = require("node:url");
 const db = require("../chat/db/urlDB");
 const mongoose = require("mongoose");
+const AtlasUrl = "mongodb+srv://siva:CGTWZAanEwmYoUp8@cluster0.zdt5qfc.mongodb.net/?retryWrites=true&w=majority"
 mongoose.connect(AtlasUrl)
  .then(()=>{
   console.log("conneted to db")
@@ -23,18 +24,19 @@ function IndexFile(res){
       res.write(data);
       res.end();
     }catch{
-      throw err
+      throw err;
     }
   })
 } 
 
-async function CreatingUser(req, res){
+async function CreatingUser(res){
   const urlParse  = url.parse(crypto.randomUUID());
   const urlPathName = urlParse.pathname;
   res.writeHead(307, {
+    "Content-Type": "text/html",
     "Location": `/users/${urlPathName}`, 
   })
-  res.end();
+  res.end(urlPathName);
   try{
     const dbs = await db.create({
       url: `/users/${urlPathName}`, 
@@ -50,15 +52,21 @@ async function WebSocketFile(req, res){
   ipAddress.ip.push(req.socket.remoteAddress);
   ipAddress.ip.splice(2);
   await ipAddress.save();
+  for(let i=0; i<ipAddress.ip.length; i++){
+    if(ipAddress.ip[i] === req.socket.remoteAddress){
+      ipAddress.ip.splice(0, i);
+    }
+  }
+  console.log(ipAddress);
   res.writeHead(200, {
-    "Content-type": "text/html",
+    "Content-type": "text/html", 
   })
   return fs.readFile(`${__dirname}/public/websocket.html`, (err, data)=>{
     try {
       res.write(data);
       res.end();
     }catch{
-      throw err;
+      throw err;    
     }
   })
 }
@@ -77,14 +85,10 @@ const app  = http.createServer(async(req, res)=>{
   }
 
   if(req.url === "/redirects" && req.method === "GET"){
-    CreatingUser(req, res);
+    CreatingUser(res);
   }
 
   if(await db.findOne({"url":req.url})){
-    const brain = await db.findOne({
-      "url": req.url
-    })
-    console.log(brain.ip.length);
     WebSocketFile(req, res);
   }
 
