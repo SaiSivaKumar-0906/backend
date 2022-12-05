@@ -7,6 +7,7 @@ const crypto = require("node:crypto");
 const url = require("node:url");
 const db = require("../chat/db/urlDB");
 const mongoose = require("mongoose");
+const AtlasUrl = "mongodb+srv://siva:CGTWZAanEwmYoUp8@cluster0.zdt5qfc.mongodb.net/?retryWrites=true&w=majority"
 mongoose.connect(AtlasUrl)
  .then(()=>{
   console.log("conneted to db")
@@ -22,6 +23,7 @@ function IndexFile(res){
       })
       res.write(data);
       res.end();
+      return;
     }catch{
       throw err;
     }
@@ -44,6 +46,7 @@ async function CreatingUser(res){
   }catch(err){
     throw err;
   }
+  return;
 }
 
 async function WebSocketFile(req, res){
@@ -56,11 +59,12 @@ async function WebSocketFile(req, res){
       ipAddress.ip.splice(0, i);
     }
   }
-  console.log(ipAddress);
+  // console.log(ipAddress);
   res.writeHead(200, {
     "Content-type": "text/html", 
   })
   return fs.readFile(`${__dirname}/public/websocket.html`, (err, data)=>{
+    
     try {
       res.write(data);
       res.end();
@@ -76,23 +80,30 @@ function fourOfour(res){
   })
   res.write("Does not exist");
   res.end();
+  return;
 }
 
 const app  = http.createServer(async(req, res)=>{
-  if(req.url==="/" && req.method === "GET"){  
-    IndexFile(res);
+  const serach = await db.findOne({"url":req.url});
+
+  if(await req.url === "/" && req.method === "GET"){ 
+    console.log("why...???")
+    return IndexFile(res); 
   }
 
   if(req.url === "/redirects" && req.method === "GET"){
-    CreatingUser(res);
+    console.log("dude this is a shitty programm..")
+    return CreatingUser(res);
   }
 
-  if(await db.findOne({"url":req.url})){
-    WebSocketFile(req, res);
+  if(serach){
+    console.log("why two..??")
+    return WebSocketFile(req, res);
   }
 
-  if(!await db.findOne({"url":req.url})){
-    fourOfour(res);
+  if(!serach){
+    console.log("it if is ture why the fuck it is not running")
+    return fourOfour(res);
   }
 });
 
