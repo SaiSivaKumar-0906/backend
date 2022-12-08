@@ -39,30 +39,28 @@ async function CreatingUser(res){
   }catch(err){
     throw err;
   }
-  res.writeHead(307, {
+  res.writeHead(201, {
     "Content-Type": "text/html",
-    "Location": `/users/${urlPathName}`, 
+    "Location": `http:192.168.0.110:8080/users/${urlPathName}`, 
   })
-  res.end();
+  res.write(`http://192.168.0.110:8080/users/${urlPathName}`)
+  res.end()
   return;
 }
 
 async function WebSocketFile(req, res){
-  const ipAddress = await db.findOne({"url": req.url});
-  ipAddress.ip.push(req.socket.remoteAddress);
-  ipAddress.ip.splice(2);
-  await ipAddress.save();
-  for(let i=0; i<ipAddress.ip.length; i++){
-    if(ipAddress.ip[i] === req.socket.remoteAddress){
-      ipAddress.ip.splice(0, i);
-    }
+  const ip = req.socket.remoteAddress;
+  const find = await db.findOne({"url":req.url});
+  find.ip.push(ip);
+  if(find.ip.length >= 3){
+    find.ip.splice(2);
+    find.save();
   }
-  // console.log(ipAddress);
+  console.log(find);
   res.writeHead(200, {
     "Content-type": "text/html", 
   })
   return fs.readFile(`${__dirname}/public/websocket.html`, (err, data)=>{
-    
     try {
       res.write(data);
       res.end();
@@ -85,7 +83,7 @@ const app  = http.createServer(async(req, res)=>{
   console.log(req.url);
   const serach = await db.findOne({"url":req.url});
 
-  if(await req.url === "/" && req.method === "GET"){
+  if(req.url === "/" && req.method === "GET"){
     return IndexFile(res); 
   }
 
