@@ -50,14 +50,6 @@ async function CreatingUser(res){
 }
 
 async function WebSocketFile(req, res){
-  const ip = req.socket.remoteAddress;
-  const find = await db.findOne({"url":req.url});
-  find.ip.push(ip);
-  if(find.ip.length >= 3){
-    find.ip.splice(2);
-    find.save();
-  }
-  console.log(find);
   res.writeHead(200, {
     "Content-type": "text/html", 
   })
