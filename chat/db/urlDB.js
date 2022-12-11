@@ -5,10 +5,6 @@ const models = mongoose.Schema({
         type: String,
         unique: true
     }, 
-    ip:{
-        type: Array, 
-        require: true
-    }
 })
 
 const dbs = mongoose.model("urls", models);
