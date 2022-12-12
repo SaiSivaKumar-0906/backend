@@ -2,15 +2,11 @@ const http = require("node:http");
 const db = require("../db/authDb").db;
 const mongoose = require("mongoose");
 const fs = require("node:fs")
-const atlasUrl = "mongodb+srv://auth_name:nuOIiPtiPylLUe3j@cluster0.kag9vlv.mongodb.net/?retryWrites=true&w=majority"
 mongoose.connect(atlasUrl).then(()=>{
     console.log("db connected!!");
 }).catch((err)=>{
     throw err;
 })
-
-const dir = __dirname;
-const fileName = "fun.json";
 
 async function Post(req, res){
     const PostData = [];
@@ -32,11 +28,6 @@ async function Post(req, res){
             password
         })
         if(userData){
-            fs.appendFileSync(fileName, JSON.stringify({username, password},), (err)=>{
-                if(err){
-                    throw err;
-                }
-            })
             res.writeHead(201, {
                 "Content-Type": "application/json"
             })
@@ -64,5 +55,3 @@ const app = http.createServer((req, res)=>{
 app.listen(80, ()=>{
     console.log(80)
 })
-
-// nuOIiPtiPylLUe3j
