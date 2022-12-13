@@ -1,8 +1,10 @@
 const http = require("node:http");
 const db = require("../db/authDb").db;
 const mongoose = require("mongoose");
-const fs = require("node:fs")
-mongoose.connect(atlasUrl).then(()=>{
+const bycrypt = require("bcrypt");
+const slatRounds = 10;
+const temp = "mongodb://127.0.0.1/temp-pass"
+mongoose.connect(temp || atlasUrl).then(()=>{
     console.log("db connected!!");
 }).catch((err)=>{
     throw err;
@@ -22,28 +24,36 @@ async function Post(req, res){
         res.end();
         return;
     }
-    try{
-        const userData = await db.create({
-            username,
-            password
+    bycrypt.genSalt(slatRounds, (err, salt)=>{
+        bycrypt.hash(password, salt, async(err, hasedPassword)=>{
+            if(err){
+                throw err;
+            }
+            try{
+               const userData = await db.create({
+                  username, 
+                  hasedPassword
+               })
+               if(userData){
+                console.log(userData);
+                res.writeHead(201, {
+                   "Content-Type": "application/json"
+                })
+                res.write(JSON.stringify("created!!"));
+                res.end();
+               }
+            }
+            catch(err){
+                if(err.code === 11000){
+                    res.writeHead(404, {
+                        "Content-Type": "application/json"
+                    })
+                    res.write(JSON.stringify("username already exist!!"));
+                    res.end();
+                }
+            }
         })
-        if(userData){
-            res.writeHead(201, {
-                "Content-Type": "application/json"
-            })
-            res.write(JSON.stringify("created!!"));
-            res.end();
-            return;
-        }
-    }catch(err){
-        if(err.code === 11000){
-            res.writeHead(404, {
-                "Content-Type": "application/json"
-            })
-            res.write(JSON.stringify("username already exist!!"));
-            res.end();
-        }
-    }
+    })
 }
 
 const app = http.createServer((req, res)=>{
