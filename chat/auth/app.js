@@ -3,8 +3,7 @@ const db = require("../db/authDb").db;
 const mongoose = require("mongoose");
 const bycrypt = require("bcrypt");
 const slatRounds = 10;
-const temp = "mongodb://127.0.0.1/temp-pass"
-mongoose.connect(temp || atlasUrl).then(()=>{
+mongoose.connect(atlasUrl).then(()=>{
     console.log("db connected!!");
 }).catch((err)=>{
     throw err;
