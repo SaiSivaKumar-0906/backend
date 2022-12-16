@@ -1,4 +1,3 @@
-const http = require("node:http");
 const db = require("../db/authDb").db;
 const mongoose = require("mongoose");
 const bycrypt = require("bcrypt");
@@ -24,6 +23,7 @@ async function Post(req, res){
         return;
     }
     bycrypt.genSalt(slatRounds, (err, salt)=>{
+        console.log(err);
         bycrypt.hash(password, salt, async(err, hasedPassword)=>{
             if(err){
                 throw err;
@@ -33,6 +33,7 @@ async function Post(req, res){
                   username, 
                   hasedPassword
                })
+               console.log(userData)
                if(userData){
                 console.log(userData);
                 res.writeHead(201, {
@@ -54,13 +55,4 @@ async function Post(req, res){
         })
     })
 }
-
-const app = http.createServer((req, res)=>{
-    if(req.method === "POST" && req.url === "/user/info"){
-        Post(req, res);
-    }
-})
-
-app.listen(80, ()=>{
-    console.log(80)
-})
+module.exports.auth = Post
