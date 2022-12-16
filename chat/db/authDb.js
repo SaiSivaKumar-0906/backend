@@ -9,7 +9,11 @@ const models = mongoose.Schema({
     hasedPassword:{
         type: String, 
         require: true
-    }
+    },
+    url:{
+        type: String,
+        require: true
+    },
 })
 
 const dbs = mongoose.model("atuh", models);
