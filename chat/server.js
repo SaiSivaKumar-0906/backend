@@ -1,13 +1,14 @@
 const http = require("node:http");
+const authFunction = require("../chat/auth/app").auth
 const { WebSocketServer } = require("ws");
 const ws = require("ws")
 const WebSocket = require("ws");
+
 const fs = require("node:fs")
 const crypto = require("node:crypto");
 const url = require("node:url");
-const db = require("../chat/db/urlDB");
+const db = require("../chat/db/authDb").db;
 const mongoose = require("mongoose");
-const AtlasUrl = "mongodb+srv://siva:CGTWZAanEwmYoUp8@cluster0.zdt5qfc.mongodb.net/?retryWrites=true&w=majority"
 mongoose.connect(AtlasUrl)
  .then(()=>{
   console.log("conneted to db")
@@ -42,14 +43,15 @@ async function CreatingUser(res){
   }
   res.writeHead(201, {
     "Content-Type": "text/html",
-    "Location": `http:192.168.0.110:8080/users/${urlPathName}`, 
+    "Location": `http:192.168.0.104:8080/users/${urlPathName}`, 
   })
-  res.write(`http://192.168.0.110:8080/users/${urlPathName}`)
+  res.write(`http://192.168.0.104:8080/users/${urlPathName}`)
   res.end()
   return;
 }
 
 async function WebSocketFile(req, res){
+  
   res.writeHead(200, {
     "Content-type": "text/html", 
   })
@@ -73,9 +75,6 @@ function fourOfour(res){
 }
 
 const app  = http.createServer(async(req, res)=>{
-  console.log(req.url);
-  const serach = await db.findOne({"url":req.url});
-
   if(req.url === "/" && req.method === "GET"){
     return IndexFile(res); 
   }
@@ -84,12 +83,16 @@ const app  = http.createServer(async(req, res)=>{
     return CreatingUser(res);
   }
 
-  if(await db.findOne({"url":req.url})){
+  if(req.method === "GET" && await db.findOne({"url":req.url})){
     return WebSocketFile(req, res);
   }
 
-  if(!await db.findOne({"url":req.url})){
+  if(req.method === "GET" && !await db.findOne({"url":req.url})){
     return fourOfour(res);
+  }
+
+  if(req.url === "/user/info" && req.method === "POST"){
+    authFunction(req, res, db)
   }
 });
 
