@@ -1,14 +1,7 @@
-const db = require("../db/authDb").db;
-const mongoose = require("mongoose");
 const bycrypt = require("bcrypt");
 const slatRounds = 10;
-mongoose.connect(atlasUrl).then(()=>{
-    console.log("db connected!!");
-}).catch((err)=>{
-    throw err;
-})
 
-async function Post(req, res){
+async function Post(req, res, db){
     const PostData = [];
     for await(const data of req){
         PostData.push(data);
@@ -23,7 +16,6 @@ async function Post(req, res){
         return;
     }
     bycrypt.genSalt(slatRounds, (err, salt)=>{
-        console.log(err);
         bycrypt.hash(password, salt, async(err, hasedPassword)=>{
             if(err){
                 throw err;
@@ -33,9 +25,7 @@ async function Post(req, res){
                   username, 
                   hasedPassword
                })
-               console.log(userData)
                if(userData){
-                console.log(userData);
                 res.writeHead(201, {
                    "Content-Type": "application/json"
                 })
