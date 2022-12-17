@@ -3,11 +3,10 @@ const authFunction = require("../chat/auth/app").auth
 const { WebSocketServer } = require("ws");
 const ws = require("ws")
 const WebSocket = require("ws");
-
 const fs = require("node:fs")
 const crypto = require("node:crypto");
 const url = require("node:url");
-const db = require("../chat/db/authDb").db;
+const db = require("./db/authDb").db
 const mongoose = require("mongoose");
 mongoose.connect(AtlasUrl)
  .then(()=>{
@@ -32,25 +31,28 @@ function IndexFile(res){
 } 
 
 async function CreatingUser(res){
-  const urlParse  = url.parse(crypto.randomUUID());
+  const urlParse = url.parse(`/users/${crypto.randomUUID()}`);
   const urlPathName = urlParse.pathname;
   try{
-    const dbs = await db.create({
-      url: `/users/${urlPathName}`, 
+    const dbs = db.create({
+      url: urlPathName
     })
+    if(dbs){
+      res.writeHead(201, {
+        "Content-Type": "text/html",
+        "Location": `http://localhost:8080${urlPathName}`
+      })
+      res.write(`http://localhost:8080${urlPathName}`);
+      res.end();
+    }
   }catch(err){
-    throw err;
+    if(err){
+      throw err;
+    }
   }
-  res.writeHead(201, {
-    "Content-Type": "text/html",
-    "Location": `http:192.168.0.104:8080/users/${urlPathName}`, 
-  })
-  res.write(`http://192.168.0.104:8080/users/${urlPathName}`)
-  res.end()
-  return;
 }
 
-async function WebSocketFile(req, res){
+async function WebSocketFile(res){
   
   res.writeHead(200, {
     "Content-type": "text/html", 
