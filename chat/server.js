@@ -17,15 +17,15 @@ mongoose.connect(AtlasUrl)
 
 function IndexFile(res){
   return fs.readFile(`${__dirname}/public/index.html` , (err, data)=>{
-    try{
+    if(err){
+      throw err
+    }
+    if(data){
       res.writeHead(200, {
         "Content-Type": "text/html"
       })
       res.write(data);
-      res.end();
-      return;
-    }catch{
-      throw err;
+      res.end()
     }
   })
 } 
