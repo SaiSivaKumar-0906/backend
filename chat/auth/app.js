@@ -23,7 +23,8 @@ async function Post(req, res, db){
             try{
                const userData = await db.create({
                   username, 
-                  hasedPassword
+                  hasedPassword,
+                  url:req.url
                })
                if(userData){
                 res.writeHead(201, {
