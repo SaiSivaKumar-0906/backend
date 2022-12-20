@@ -5,7 +5,6 @@ const ws = require("ws")
 const WebSocket = require("ws");
 const fs = require("node:fs")
 const crypto = require("node:crypto");
-const url = require("node:url");
 const db = require("./db/authDb").db
 const mongoose = require("mongoose");
 mongoose.connect(AtlasUrl)
@@ -30,30 +29,7 @@ function IndexFile(res){
   })
 } 
 
-async function CreatingUser(res){
-  const urlParse = url.parse(`/users/${crypto.randomUUID()}`);
-  const urlPathName = urlParse.pathname;
-  try{
-    const dbs = db.create({
-      url: urlPathName
-    })
-    if(dbs){
-      res.writeHead(201, {
-        "Content-Type": "text/html",
-        "Location": `http://localhost:8080${urlPathName}`
-      })
-      res.write(`http://localhost:8080${urlPathName}`);
-      res.end();
-    }
-  }catch(err){
-    if(err){
-      throw err;
-    }
-  }
-}
-
-async function WebSocketFile(res){
-  
+function WebSocketFile(res){  
   res.writeHead(200, {
     "Content-type": "text/html", 
   })
@@ -81,20 +57,16 @@ const app  = http.createServer(async(req, res)=>{
     return IndexFile(res); 
   }
 
-  if(req.url === "/redirects" && req.method === "GET"){
-    return CreatingUser(res);
-  }
-
-  if(req.method === "GET" && await db.findOne({"url":req.url})){
+  if(req.method === "GET" && req.url === "/websocketFile"){
     return WebSocketFile(req, res);
   }
 
-  if(req.method === "GET" && !await db.findOne({"url":req.url})){
-    return fourOfour(res);
-  }
+  // if(req.method === "GET" && !await db.findOne({"url":req.url})){
+  //   return fourOfour(res);
+  // }
 
   if(req.url === "/user/info" && req.method === "POST"){
-    authFunction(req, res, db)
+    authFunction(req, res, db);
   }
 });
 
@@ -126,6 +98,6 @@ wss.on("connection", (ws)=>{
   })
 })
 
-app.listen(8080, ()=>{
+app.listen(80, ()=>{
   console.log(80)
 })
