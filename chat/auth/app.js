@@ -1,6 +1,37 @@
 const bycrypt = require("bcrypt");
 const slatRounds = 10;
 
+async function CreatingScehema(res, username, hashedPassword, db){
+    try{
+        const created = await db.create({
+            username,
+            hashedPassword
+        })
+        if(created){
+            res.writeHead(201, {
+                "Location": "http://localhost/websocketFile",
+                "Content-Type": "text/html"
+            })
+            res.end();
+        }
+        if(!created){
+            res.writeHead(500, {
+                "Content-Type": "application/json"
+            })
+            res.write(JSON.stringify("it is our mistake!!"));
+            res.end();
+        }
+    }catch(err){
+        if(err.code === 11000){
+            res.writeHead(404, {
+                "Content-Type":"application/json"
+            })
+            res.write(JSON.stringify("username already taken"));
+            res.end();
+        }
+    }
+}
+
 async function Post(req, res, db){
     const PostData = [];
     for await(const data of req){
@@ -16,33 +47,14 @@ async function Post(req, res, db){
         return;
     }
     bycrypt.genSalt(slatRounds, (err, salt)=>{
-        bycrypt.hash(password, salt, async(err, hasedPassword)=>{
+        if(err){
+            throw err;
+        }
+        bycrypt.hash(password, salt, async(err, hashedPassword)=>{
             if(err){
                 throw err;
             }
-            try{
-               const userData = await db.create({
-                  username, 
-                  hasedPassword,
-                  url:req.url
-               })
-               if(userData){
-                res.writeHead(201, {
-                   "Content-Type": "application/json"
-                })
-                res.write(JSON.stringify("created!!"));
-                res.end();
-               }
-            }
-            catch(err){
-                if(err.code === 11000){
-                    res.writeHead(404, {
-                        "Content-Type": "application/json"
-                    })
-                    res.write(JSON.stringify("username already exist!!"));
-                    res.end();
-                }
-            }
+            CreatingScehema(res, username, hashedPassword, db);
         })
     })
 }
