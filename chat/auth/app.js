@@ -58,4 +58,5 @@ async function Post(req, res, db){
         })
     })
 }
-module.exports.auth = Post
+
+module.exports.auth = Pos
