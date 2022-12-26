@@ -1,16 +1,20 @@
 const bycrypt = require("bcrypt");
+const url = require("node:url");
 const slatRounds = 10;
 
 async function CreatingScehema(res, username, hashedPassword, db){
+    const urlParse = url.parse(crypto.randomUUID());
+    const urlPathName = `/${urlParse.pathname}`
     try{
         const created = await db.create({
             username,
-            hashedPassword
+            hashedPassword,
+            url:urlPathName
         })
         if(created){
             res.writeHead(201, {
-                "Location": "http://localhost/websocketFile",
-                "Content-Type": "text/html"
+                "Location": `http://localhost:80${urlPathName}`,
+                "Content-Type": "application/json"
             })
             res.end();
         }
@@ -50,7 +54,7 @@ async function Post(req, res, db){
         if(err){
             throw err;
         }
-        bycrypt.hash(password, salt, async(err, hashedPassword)=>{
+        bycrypt.hash(password, salt, (err, hashedPassword)=>{
             if(err){
                 throw err;
             }
@@ -58,5 +62,3 @@ async function Post(req, res, db){
         })
     })
 }
-
-module.exports.auth = Pos
