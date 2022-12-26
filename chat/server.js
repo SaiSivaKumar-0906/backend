@@ -3,8 +3,7 @@ const authFunction = require("../chat/auth/app").auth
 const { WebSocketServer } = require("ws");
 const ws = require("ws")
 const WebSocket = require("ws");
-const fs = require("node:fs")
-const crypto = require("node:crypto");
+const fs = require("node:fs");
 const db = require("./db/authDb").db
 const mongoose = require("mongoose");
 mongoose.connect(AtlasUrl)
@@ -19,7 +18,7 @@ function IndexFile(res){
     if(err){
       throw err
     }
-    if(data){
+    if(!err){
       res.writeHead(200, {
         "Content-Type": "text/html"
       })
@@ -34,11 +33,15 @@ function WebSocketFile(res){
     "Content-type": "text/html", 
   })
   return fs.readFile(`${__dirname}/public/websocket.html`, (err, data)=>{
-    try {
+    if(err){
+      throw err;
+    }
+    if(!err){
+      res.writeHead(200, {
+        "Content-Type": "text/html"
+      })
       res.write(data);
       res.end();
-    }catch{
-      throw err;    
     }
   })
 }
@@ -57,16 +60,16 @@ const app  = http.createServer(async(req, res)=>{
     return IndexFile(res); 
   }
 
-  if(req.method === "GET" && req.url === "/websocketFile"){
-    return WebSocketFile(req, res);
+  if(await db.findOne({url: req.url}) && req.method === "GET"){
+    return WebSocketFile(res);
   }
 
-  // if(req.method === "GET" && !await db.findOne({"url":req.url})){
-  //   return fourOfour(res);
-  // }
+  if(req.method === "GET" && !(await db.findOne({url: req.url}))){
+    return fourOfour(res);
+  }
 
   if(req.url === "/user/info" && req.method === "POST"){
-    authFunction(req, res, db);
+    return authFunction(req, res, db);
   }
 });
 
