@@ -6,7 +6,7 @@ const models = mongoose.Schema({
         require: true,
         unique: true
     },
-    hasedPassword:{
+    hashedPassword:{
         type: String, 
         require: true
     },
