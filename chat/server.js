@@ -3,9 +3,10 @@ const authFunction = require("../chat/auth/app").auth
 const { WebSocketServer } = require("ws");
 const ws = require("ws")
 const WebSocket = require("ws");
-const fs = require("node:fs");
+const fs = require("node:fs");  
 const db = require("./db/authDb").db
 const mongoose = require("mongoose");
+const AtlasUrl = "mongodb+srv://websockets_auth:II94w9GGFqa0Ub0e@cluster0.jhhpho2.mongodb.net/?retryWrites=true&w=majority"
 mongoose.connect(AtlasUrl)
  .then(()=>{
   console.log("conneted to db")
@@ -60,7 +61,7 @@ const app  = http.createServer(async(req, res)=>{
     return IndexFile(res); 
   }
 
-  if(await db.findOne({url: req.url}) && req.method === "GET"){
+  if(await db.findOne({url: req.url})){
     return WebSocketFile(res);
   }
 
