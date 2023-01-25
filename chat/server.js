@@ -6,7 +6,6 @@ const WebSocket = require("ws");
 const fs = require("node:fs");  
 const db = require("./db/authDb").db
 const mongoose = require("mongoose");
-const AtlasUrl = "mongodb+srv://websockets_auth:II94w9GGFqa0Ub0e@cluster0.jhhpho2.mongodb.net/?retryWrites=true&w=majority"
 mongoose.connect(AtlasUrl)
  .then(()=>{
   console.log("conneted to db")
