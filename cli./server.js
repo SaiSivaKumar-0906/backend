@@ -1,12 +1,13 @@
 const http = require("node:http");
-const post = require("./http-methods/methods").post;
+const {Post} = require("./http-methods/methods")
+
 
 const app = http.createServer((req, res)=>{
     if(req.method === "POST"){
-        post(req, res)
+        Post(req, res);
     }
 })
 
-app.listen(200, ()=>{
-    console.log(200)
+app.listen(80, ()=>{
+    console.log(80)
 })
