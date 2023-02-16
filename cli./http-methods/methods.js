@@ -1,31 +1,30 @@
-const headersPost = {
-  statuscodes : [200, 401],
-  content: function(n){
+const httpHeaders = {
+  statusCodes : [201, 401, 501],
+  contentType: function(mimeType){
     const obj = {
-      "Content-Type" : n
+      "Content-Type": mimeType
     }
     return obj;
   }
 }
 
-const created = "got the data!!";
-const fourOfour = "you should write the content!!!"
 
-async function post(req, res){
+async function postReq(req, res){
   const postData = [];
   for await(const data of req){
     postData.push(data);
   }
-  const {recivedData} = JSON.parse(Buffer.concat(postData).toString());
-  if(recivedData){
-    res.writeHead(headersPost.statuscodes[0],  headersPost.content("application/json"));
-    res.write(JSON.stringify(created));
+  const {data} = JSON.parse(Buffer.concat(postData).toString());
+  if(data){
+    console.log(data);
+    res.writeHead(httpHeaders.statusCodes[0], httpHeaders.contentType("application/json"));
+    res.write(JSON.stringify("created"));
     res.end();
-  } else{
-    res.writeHead(headersPost.statuscodes[1], headersPost.content("application/json"));
-    res.write(JSON.stringify(fourOfour));
-    res.end();   
+  }else{
+    res.writeHead(httpHeaders.statusCodes[1], httpHeaders.contentType("application/json"));
+    res.write(JSON.stringify("you should enter the data"));
+    res.end();
   }
 }
 
-module.exports.post = post;
+module.exports.Post = postReq
