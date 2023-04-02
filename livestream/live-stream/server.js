@@ -5,7 +5,7 @@ const httpStatusCodes = {
     "Status-Codes" : [200, 201, 404, 500],
     "mime-type": function(type){
         const mimeType = {
-            "type": type
+            "Content-Type": type
         }
         return mimeType;
     }
@@ -13,6 +13,14 @@ const httpStatusCodes = {
 
 function existDir(){
     const dirName = `${__dirname}/public/index.html`
+    const existFile = fs.existsSync(dirName);
+    if(existFile){
+        return dirName
+    }
+}
+
+function existCamera(){
+    const dirName = `${__dirname}/public/camera.html`
     const existFile = fs.existsSync(dirName);
     if(existFile){
         return dirName
@@ -31,10 +39,16 @@ function indexHtml(res){
     })
 }
 
-function notGet(res){
-    res.writeHead(httpStatusCodes["Status-Codes"][2], httpStatusCodes["mime-type"]("text/html"));
-    res.write("Sorry brother!!. You do not exist!!");
-    res.end();
+function cameraHtml(res){
+    const fileName = existCamera();
+    fs.readFile(fileName, (err, data)=>{
+        if(err){
+            throw err;
+        }
+        res.writeHead(httpStatusCodes["Status-Codes"][0], httpStatusCodes["mime-type"]("text/html"));
+        res.write(data);
+        res.end();
+    })
 }
 
 const port = http.createServer((req, res)=>{
@@ -46,10 +60,11 @@ const port = http.createServer((req, res)=>{
     if(reqMethod.Get){
         indexHtml(res);
     }
-    
-    if(!reqMethod.Get){
-        notGet(res);
+
+    if(reqMethod.Post){
+        cameraHtml(res);
     }
+    
 })
 
 port.listen(80, ()=>{
