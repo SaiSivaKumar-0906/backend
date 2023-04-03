@@ -2,13 +2,14 @@ const http = require("node:http");
 const fs = require("node:fs");
 
 const httpStatusCodes = {
-    "Status-Codes" : [200, 201, 404, 500],
+    "Status-Codes" : [200, 302, 404, 500],
     "mime-type": function(type){
         const mimeType = {
             "Content-Type": type
         }
         return mimeType;
-    }
+    },
+    "Location": "http://localhost:80/camera"
 }
 
 function existDir(){
@@ -51,20 +52,31 @@ function cameraHtml(res){
     })
 }
 
+function redirection(res){
+    res.writeHead(httpStatusCodes["Status-Codes"][1], {
+        "Location": "http://localhost:80/camera"
+    });
+    res.end();
+}
+
 const port = http.createServer((req, res)=>{
     const reqMethod = {
         Get: Boolean(req.method === "GET"),
-        Post: Boolean(req.method === "POST")
+        Post: Boolean(req.method === "POST"),
+        GetMethod: Boolean(req.url === "/camera")
     }
 
-    if(reqMethod.Get){
+    if(reqMethod.Get && req.url === "/"){
         indexHtml(res);
     }
 
     if(reqMethod.Post){
-        cameraHtml(res);
+        redirection(res);
     }
     
+    if(reqMethod.Get && reqMethod.GetMethod){
+        cameraHtml(res);
+    }
 })
 
 port.listen(80, ()=>{
