@@ -1,12 +1,12 @@
-const {WebSocketServer} = require("ws");
+const ws = require("ws");
 
-const wss = new WebSocketServer({
-    port: 8080
-})
-
-wss.on("connection", (ws)=>{
-    ws.on("message", (data)=>{
-        console.log(data);
+function webSocketServer(httpServer){
+    const wss = new ws.WebSocketServer({
+        server: httpServer
     })
-    ws.send("currently it will work?")
-})
+    wss.on("connection", (ws)=>{
+        ws.send("so I could able to established/changed http to websocket connection?")
+    })
+}
+
+module.exports.webSocketServer = webSocketServer;
