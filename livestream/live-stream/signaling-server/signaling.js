@@ -1,12 +1,17 @@
 const ws = require("ws");
 
-function webSocketServer(httpServer){
+function httpServer(HtToWs){
     const wss = new ws.WebSocketServer({
-        server: httpServer
+        server: HtToWs
     })
-    wss.on("connection", (ws)=>{
-        ws.send("so I could able to established/changed http to websocket connection?")
+    wss.on("connection", (ws, req)=>{    
+        ws.on("message", (data)=>{
+            console.log(data) //not good choice to do..
+        })
+        ws.send("will it change the protocol?");
     })
 }
 
-module.exports.webSocketServer = webSocketServer;
+
+
+module.exports.httpServer = httpServer;
