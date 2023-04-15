@@ -1,6 +1,6 @@
 const http = require("node:http");
 const fs = require("node:fs");
-const webSocketServer = require("./signalingserver/signaling").webSocketServer;
+const HtToWs = require("./signalingserver/signaling").httpServer
 
 const httpStatusCodes = {
     "Status-Codes" : [200, 302, 404, 500],
@@ -80,5 +80,6 @@ const serverInstance = http.createServer((req, res)=>{
     }
 })
 
-webSocketServer(serverInstance);
+HtToWs(serverInstance);
+
 serverInstance.listen(80);
