@@ -1,6 +1,6 @@
 const ws = require("ws");
 const fs = require("fs");
-const array = [];
+const arrayTwo = [];
 const {Readable} = require("node:stream");
 
 function httpServer(HtToWs){
@@ -8,21 +8,14 @@ function httpServer(HtToWs){
         server: HtToWs
     })
     wss.on("connection", (ws)=>{    
-        ws.on("message", async(data)=>{
-            for await(const datas of data){
-                array.push(datas);
-            }
-            const readIt = new Readable();
-            readIt._read = ()=>{
-                array.forEach(chunk =>{
-                    readIt.push(chunk);
-                })
-            }
-            readIt.push(null);
-            const stream = fs.createWriteStream("experiment.webm");
-            readIt.pipe(stream);
-        })
+        ws.on("message", function(data){
+            arrayTwo.push(data);
+        });
     })
 }
 
-module.exports.httpServer = httpServer;
+if(arrayTwo.length > 1){
+    console.log(arrayTwo);
+}
+
+module.exports.hTows = httpServer
