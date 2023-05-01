@@ -1,66 +1,65 @@
-const bycrypt = require("bcrypt");
-const url = require("node:url");
-const slatRounds = 10;
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
-async function CreatingScehema(res, username, hashedPassword, db){
-    const urlParse = url.parse(crypto.randomUUID());
-    const urlPathName = `/${urlParse.pathname}`
-    try{
-        const created = await db.create({
-            username,
-            hashedPassword,
-            url:urlPathName
+async function storeHasedPassword(username, hashedPassword, res, db){
+    const created = await db.create({
+        username, 
+        hashedPassword
+    })
+    if(created){
+        res.writeHead(201, {
+            "Content-Type" : "application/json"
         })
-        if(created){
-            res.writeHead(201, {
-                "Location": `http://localhost:80${urlPathName}`,
-                "Content-Type": "application/json"
-            })
-            res.end();
-        }
-        if(!created){
-            res.writeHead(500, {
-                "Content-Type": "application/json"
-            })
-            res.write(JSON.stringify("it is our mistake!!"));
-            res.end();
-        }
-    }catch(err){
-        if(err.code === 11000){
-            res.writeHead(404, {
-                "Content-Type":"application/json"
-            })
-            res.write(JSON.stringify("username already taken"));
-            res.end();
-        }
+        res.write(JSON.stringify({
+            "username" : "created",
+            "password" : "created"
+        }))
+        res.end();
+    }else{
+        res.writeHead(501, {
+            "Content-Type" : "application/json"
+        })
+        res.write(JSON.stringify({
+            "error" : "it is not you it is us!!"
+        }))
+        return;
     }
 }
 
-async function Post(req, res, db){
-    const PostData = [];
-    for await(const data of req){
-        PostData.push(data);
-    }
-    const {username, password} = JSON.parse(Buffer.concat(PostData).toString());
-    if(!(username && password)){
-        res.writeHead(404, {
-            "Content-Type": "application/json"
-        })
-        res.write(JSON.stringify("you must have forgotten username or password!!"));
-        res.end();
-        return;
-    }
-    bycrypt.genSalt(slatRounds, (err, salt)=>{
-        if(err){
-            throw err;
+async function hash(username, password, res, db){
+    bcrypt.hash(password, saltRounds, (err, hash)=>{
+        if(!err){
+            storeHasedPassword(username, hash, res, db);
         }
-        bycrypt.hash(password, salt, (err, hashedPassword)=>{
-            if(err){
-                throw err;
-            }
-            CreatingScehema(res, username, hashedPassword, db);
-        })
     })
 }
 
-module.exports.auth = Post
+
+async function usernameAndpassword(req, res, db){
+    const array = [];
+    for await(const data of req){
+        array.push(data);
+    }
+    const {username, password} = JSON.parse(Buffer.concat(array).toString());
+    if(!username){
+        res.writeHead(404, {
+            "Content-Type" : "application/json"
+        })
+        res.write(JSON.stringify({
+            "username" : "it is not suppose to be blank"
+        }))
+        return;
+    }
+    if(!password){
+        res.writeHead(404, {
+            "Content-Type" : "application/json"
+        })
+        res.write(JSON.stringify({
+            "password" : "it is not suppose to be blank"
+        }))
+        return;
+    }
+    hash(username, password, res, db);
+}
+
+module.exports.postData = usernameAndpassword;
